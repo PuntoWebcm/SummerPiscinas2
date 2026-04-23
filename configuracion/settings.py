@@ -134,7 +134,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuración para archivos subidos por el usuario (Fotos de piletas)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if not DEBUG:
+    # Ruta absoluta para el servidor de Render (coincide con tu Mount Path)
+    MEDIA_ROOT = '/opt/render/project/src/media'
+else:
+    # Ruta para cuando trabajás en tu compu
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Mercado Pago Config
 MP_ACCESS_TOKEN = os.getenv('MP_ACCESS_TOKEN')
