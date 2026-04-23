@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # <--- AGREGÁ ESTA LÍNEA AQUÍ
     'django.middleware.common.CommonMiddleware',
@@ -137,3 +138,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Mercado Pago Config
 MP_ACCESS_TOKEN = os.getenv('MP_ACCESS_TOKEN')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
