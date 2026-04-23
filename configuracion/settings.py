@@ -132,14 +132,14 @@ STATICFILES_DIRS = [
 # Es la carpeta donde Django copiará todos los archivos para producción
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Configuración para archivos subidos por el usuario (Fotos de piletas)
+# Configuración para fotos de piletas
 MEDIA_URL = '/media/'
 
 if not DEBUG:
-    # Ruta absoluta para el servidor de Render (coincide con tu Mount Path)
+    # Esta es la ruta estándar cuando montas un disco en Render
     MEDIA_ROOT = '/opt/render/project/src/media'
 else:
-    # Ruta para cuando trabajás en tu compu
+    # Tu ruta local
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Mercado Pago Config
