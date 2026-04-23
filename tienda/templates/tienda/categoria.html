@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} | Summer Piscinas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --azul-vulcano: #003366;
+            --celeste-agua: #00a8e8;
+            --gris-claro: #f4f7f6;
+        }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); }
+        
+        .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
+        .navbar-brand { color: var(--azul-vulcano) !important; letter-spacing: 1px; }
+
+        /* Estilo de Tarjetas igual al Index */
+        .product-card { border: none; border-radius: 0; transition: transform 0.3s; background: white; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .card-img-top { height: 180px; object-fit: contain; padding: 15px; background: white; }
+        
+        .btn-vulcano { background-color: var(--azul-vulcano); color: white; border-radius: 0; font-weight: bold; }
+        .btn-vulcano:hover { background-color: var(--celeste-agua); color: white; }
+        
+        .section-title {
+            color: var(--azul-vulcano);
+            border-left: 5px solid var(--celeste-agua);
+            padding-left: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Botón Carrito Flotante */
+        .btn-carrito {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background-color: var(--azul-vulcano); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; border: none;
+        }
+        .badge-carrito {
+            position: absolute; top: 0; right: 0; background-color: #ff4d4d;
+            border-radius: 50%; width: 22px; height: 22px; font-size: 0.7rem;
+            display: flex; align-items: center; justify-content: center; border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto text-center align-items-center">
+                    <li class="nav-item"><a class="nav-link fw-bold text-dark" href="/">INICIO</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" data-bs-toggle="dropdown">PRODUCTOS</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Limpieza' %}">Limpieza</a></li>
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Piletas' %}">Productos para piscinas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Equipamiento' %}">Equipamiento para piscinas</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item ms-lg-3"><a class="nav-link btn btn-vulcano btn-sm text-white px-3" href="/#contacto">CONTACTO</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <button class="btn-carrito" data-bs-toggle="modal" data-bs-target="#modalCarrito">
+        <i class="fas fa-shopping-cart"></i>
+        {% if request.session.carrito %}
+            <span class="badge-carrito">{{ request.session.carrito|length }}</span>
+        {% endif %}
+    </button>
+
+    <main class="container my-5 pt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Inicio</a></li>
+                <li class="breadcrumb-item active">{{ titulo }}</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="section-title mb-0">{{ titulo }}</h2>
+            <form method="GET" class="d-flex" style="max-width: 300px;">
+                <input class="form-control form-control-sm me-2" type="search" name="buscar" placeholder="Buscar en esta sección..." value="{{ request.GET.buscar }}">
+                <button class="btn btn-outline-primary btn-sm" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="row">
+            {% for p in productos %}
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card h-100 product-card shadow-sm border text-center">
+                    {% if p.imagen %}
+                        <img src="{{ p.imagen.url }}" class="card-img-top">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300" class="card-img-top">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column p-2 p-md-3">
+                        <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
+                        <div class="mt-auto">
+                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
+                                <a href="{% url 'agregar' p.id %}?next=carrito" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <p class="lead text-muted">No encontramos productos en esta categoría.</p>
+                <a href="/" class="btn btn-vulcano">VOLVER AL INICIO</a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <div class="modal fade" id="modalCarrito" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Tu Carrito</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% if request.session.carrito %}
+                    <div class="table-responsive">
+                        <table class="table align-middle text-center">
+                            <thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal</th><th></th></tr></thead>
+                            <tbody>
+                                {% for key, value in request.session.carrito.items %}
+                                <tr>
+                                    <td class="text-start small">{{ value.nombre }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'restar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">-</a>
+                                            <span class="px-2">{{ value.cantidad }}</span>
+                                            <a href="{% url 'agregar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">+</a>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">${{ value.total }}</td>
+                                    <td><a href="{% url 'eliminar' value.producto_id %}?next=carrito" class="text-danger"><i class="fas fa-trash"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center py-4">El carrito está vacío.</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    {% if request.session.carrito %}
+                        <a href="{% url 'checkout_carrito' %}" class="btn btn-vulcano">FINALIZAR COMPRA</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="small text-muted mb-0">© 2026 Summer Piscinas - Río Cuarto</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script para reabrir el carrito automáticamente al agregar productos
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('show_carrito') === '1') {
+                var myModal = new bootstrap.Modal(document.getElementById('modalCarrito'));
+                myModal.show();
+            }
+        });
+    </script>
+</body>
+</html>

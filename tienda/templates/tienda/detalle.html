@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ producto.nombre }} | Summer Piscinas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --azul-vulcano: #003366;
+            --celeste-agua: #00a8e8;
+        }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+        .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
+        .product-container { background: white; border-radius: 0; margin-top: 50px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .img-producto { max-height: 450px; object-fit: contain; width: 100%; }
+        .price-tag { color: var(--azul-vulcano); font-size: 2.5rem; font-weight: 700; }
+        
+        .btn-vulcano { background-color: var(--azul-vulcano); color: white; border-radius: 0; font-weight: bold; padding: 15px; transition: 0.3s; }
+        .btn-vulcano:hover { background-color: var(--celeste-agua); color: white; }
+        
+        .btn-whatsapp { background-color: #25d366; color: white; font-weight: bold; border-radius: 0; padding: 15px; }
+        .btn-whatsapp:hover { background-color: #1ebe57; color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/" style="color: var(--azul-vulcano);">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <div class="row product-container">
+            <div class="col-md-6 border-end text-center p-4">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" class="img-producto" alt="{{ producto.nombre }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/500x500?text=Sin+Imagen" class="img-producto">
+                {% endif %}
+            </div>
+
+            <div class="col-md-6 p-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Inicio</a></li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ producto.categoria.nombre }}</li>
+                    </ol>
+                </nav>
+                
+                <h1 class="display-5 fw-bold mb-3" style="color: var(--azul-vulcano);">{{ producto.nombre|upper }}</h1>
+                <p class="price-tag mb-4">${{ producto.precio }}</p>
+                
+                <div class="mb-4">
+                    <h5 class="fw-bold">Descripción:</h5>
+                    <p class="text-muted lead">{{ producto.descripcion }}</p>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <a href="{% url 'checkout' producto.id %}" class="btn btn-vulcano btn-lg shadow-sm">
+                        <i class="fas fa-shopping-cart me-2"></i> COMPRAR AHORA
+                    </a>
+
+                    <a href="https://wa.me/3585615079?text=Hola,%20me%20interesa%20el%20producto:%20{{ producto.nombre }}" 
+                       target="_blank" class="btn btn-whatsapp btn-lg shadow-sm">
+                        <i class="fab fa-whatsapp me-2"></i> CONSULTAR POR WHATSAPP
+                    </a>
+                    
+                    <a href="/" class="btn btn-link text-muted mt-2">← Volver al catálogo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 text-muted">
+        <small>© 2026 Summer Piscinas - Especialistas en Agua</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

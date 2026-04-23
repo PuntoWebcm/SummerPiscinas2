@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Pedido Recibido! | Summer Piscinas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-light">
+    <div class="container my-5 text-center">
+        <div class="card shadow p-5 border-0 mx-auto" style="max-width: 600px;">
+            <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+            <h2 class="fw-bold">¡Casi listo, {{ pedido.nombre_completo }}!</h2>
+            <p class="lead">Para confirmar tu compra de <strong>${{ pedido.total }}</strong>, realizá la transferencia a nuestra cuenta:</p>
+            
+            <div class="bg-white border rounded p-4 my-4 text-start">
+                <p class="mb-1"><strong>Banco:</strong> SANTANDER (o el que sea)</p>
+                <p class="mb-1"><strong>Alias:</strong> SUMMER.PISCINAS.RC <span class="text-muted">(Ejemplo)</span></p>
+                <p class="mb-1"><strong>CBU:</strong> 0000003100000000000000 <span class="text-muted">(Ejemplo)</span></p>
+                <p class="mb-0"><strong>Titular:</strong> Summer Piscinas</p>
+            </div>
+
+            <p class="text-muted">Una vez hecha la transferencia, envianos el comprobante para despachar tu producto:</p>
+            
+            <a href="https://wa.me/3585615079?text=Hola Summer Piscinas! Mi nombre es {{ pedido.nombre_completo }}, acabo de realizar la transferencia de ${{ pedido.total }} para el pedido número {{ pedido.id }}." 
+               target="_blank" class="btn btn-success btn-lg w-100 py-3 fw-bold">
+                <i class="fab fa-whatsapp me-2"></i> ENVIAR COMPROBANTE
+            </a>
+            
+            <a href="/" class="btn btn-link mt-4 text-decoration-none text-muted">Volver al inicio</a>
+        </div>
+    </div>
+</body>
+</html>

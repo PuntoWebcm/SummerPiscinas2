@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summer Piscinas | Equipamiento para piletas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --azul-vulcano: #003366;
+            --celeste-agua: #00a8e8;
+            --gris-claro: #f4f7f6;
+        }
+
+        body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: smooth; }
+
+        /* Navbar */
+        .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
+        .navbar-brand { color: var(--azul-vulcano) !important; letter-spacing: 1px; }
+        .search-nav { max-width: 400px; width: 100%; }
+        
+        .nav-admin {
+            color: #aaa !important;
+            font-size: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 4px 8px !important;
+            transition: 0.3s;
+        }
+        .nav-admin:hover { color: var(--azul-vulcano) !important; border-color: var(--azul-vulcano); background: #f8f9fa; }
+
+        /* Carrito Flotante */
+        .btn-carrito {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background-color: var(--azul-vulcano);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: 0.3s;
+            border: none;
+        }
+        .btn-carrito:hover { transform: scale(1.1); background-color: var(--celeste-agua); color: white; }
+        .badge-carrito {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4d4d;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* Hero */
+        .hero { 
+            background: linear-gradient(rgba(0,51,102,0.8), rgba(0,51,102,0.8)), url('https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+        }
+
+        /* Tarjetas */
+        .product-card, .service-card { border: none; border-radius: 0; transition: transform 0.3s; background: white; }
+        .product-card:hover, .service-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .card-img-top { height: 180px; object-fit: contain; padding: 15px; background: white; }
+        .category-badge { font-size: 0.65rem; color: var(--celeste-agua); text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        
+        .btn-vulcano { background-color: var(--azul-vulcano); color: white; border-radius: 0; font-weight: bold; transition: 0.3s; }
+        .btn-vulcano:hover { background-color: var(--celeste-agua); color: white; }
+        .btn-outline-azul { border: 2px solid var(--azul-vulcano); color: var(--azul-vulcano); font-weight: bold; border-radius: 0; }
+        
+        .section-title {
+            color: var(--azul-vulcano);
+            border-left: 5px solid var(--celeste-agua);
+            padding-left: 15px;
+            font-weight: bold;
+        }
+        .res-box { background-color: #e9f7fe; border-left: 5px solid var(--celeste-agua); }
+        .calc-card { border-radius: 15px; border: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form method="GET" action="/" class="d-flex mx-auto search-nav my-2 my-lg-0">
+                    <input class="form-control me-2 border py-2" type="search" name="buscar" placeholder="¿Qué buscás para tu pileta?">
+                    <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+
+                <ul class="navbar-nav ms-auto text-center align-items-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle fw-bold text-dark" href="#" id="prodDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            PRODUCTOS
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="prodDropdown">
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Limpieza' %}">Limpieza</a></li>
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Piletas' %}">Productos para piscinas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Equipamiento' %}">Equipamiento para piscinas</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-dark" href="#servicios">SERVICIOS</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-dark" href="#calculadora">CALCULADORA</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-dark" href="#nosotros">NOSOTROS</a></li>
+                    <li class="nav-item ms-lg-5"><a class="nav-link nav-admin" href="/admin"><i class="fas fa-lock"></i> ADMIN</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <button class="btn-carrito" data-bs-toggle="modal" data-bs-target="#modalCarrito">
+        <i class="fas fa-shopping-cart"></i>
+        {% if request.session.carrito %}
+            <span class="badge-carrito">{{ request.session.carrito|length }}</span>
+        {% endif %}
+    </button>
+
+    <header class="hero text-center">
+        <div class="container">
+            <h1 class="display-3 fw-bold">Soluciones para tu Piscina</h1>
+            <p class="lead">Calidad profesional en mantenimiento y equipamiento.</p>
+            <hr class="mx-auto" style="width: 60px; border: 2px solid var(--celeste-agua); opacity: 1;">
+        </div>
+    </header>
+
+    <section id="servicios" class="py-5" style="background-color: #e9ecef;">
+        <div class="container">
+            <div class="text-center mb-5"><h2 class="fw-bold" style="color: var(--azul-vulcano);">Nuestros Servicios Profesionales</h2></div>
+            <div class="row g-4 text-center">
+                <div class="col-md-6">
+                    <div class="card h-100 service-card shadow-sm p-4">
+                        <i class="fas fa-tools fa-3x mb-3" style="color: var(--celeste-agua);"></i>
+                        <h4 class="fw-bold">Reparación de Equipos</h4>
+                        <p class="text-muted small">Arreglo de bombas y automatización con repuestos originales.</p>
+                        <a href="https://wa.me/3586029520" target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 service-card shadow-sm p-4">
+                        <i class="fas fa-hand-sparkles fa-3x mb-3" style="color: var(--celeste-agua);"></i>
+                        <h4 class="fw-bold">Limpieza y Mantenimiento</h4>
+                        <p class="text-muted small">Servicio especializado para que tu pileta esté siempre lista.</p>
+                        <a href="https://wa.me/3586029520" target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main id="catalogo" class="container my-5">
+        
+        <div class="row mb-5">
+            <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3 class="section-title mb-0">Limpieza</h3>
+                <a href="{% url 'ver_categoria' 'Limpieza' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
+            </div>
+            {% for p in limpieza %}
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card h-100 product-card shadow-sm border text-center">
+                    {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %}
+                    <div class="card-body d-flex flex-column p-2 p-md-3">
+                        <span class="category-badge mb-1">{{ p.categoria.nombre }}</span>
+                        <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
+                        <div class="mt-auto">
+                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
+                                <a href="{% url 'agregar' p.id %}" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados en Limpieza.</p></div>
+            {% endfor %}
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3 class="section-title mb-0">Productos para Piscinas</h3>
+                <a href="{% url 'ver_categoria' 'Piletas' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
+            </div>
+            {% for p in piletas %}
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card h-100 product-card shadow-sm border text-center">
+                    {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %}
+                    <div class="card-body d-flex flex-column p-2 p-md-3">
+                        <span class="category-badge mb-1">{{ p.categoria.nombre }}</span>
+                        <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
+                        <div class="mt-auto">
+                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
+                                <a href="{% url 'agregar' p.id %}" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados en esta sección.</p></div>
+            {% endfor %}
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+                <h3 class="section-title mb-0">Equipamiento</h3>
+                <a href="{% url 'ver_categoria' 'Equipamiento' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
+            </div>
+            {% for p in equipamiento %}
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card h-100 product-card shadow-sm border text-center">
+                    {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %}
+                    <div class="card-body d-flex flex-column p-2 p-md-3">
+                        <span class="category-badge mb-1">{{ p.categoria.nombre }}</span>
+                        <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
+                        <div class="mt-auto">
+                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
+                                <a href="{% url 'agregar' p.id %}" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados en Equipamiento.</p></div>
+            {% endfor %}
+        </div>
+
+    </main>
+
+    <div class="modal fade" id="modalCarrito" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">Tu Carrito de Compras</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% if request.session.carrito %}
+                    <div class="table-responsive">
+                        <table class="table align-middle text-center">
+                            <thead><tr><th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th></th></tr></thead>
+                            <tbody>
+                                {% for key, value in request.session.carrito.items %}
+                                <tr>
+                                    <td class="text-start small">{{ value.nombre }}</td>
+                                    <td>${{ value.precio }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'restar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">-</a>
+                                            <span class="px-2 py-1">{{ value.cantidad }}</span>
+                                            <a href="{% url 'agregar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">+</a>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">${{ value.total }}</td>
+                                    <td><a href="{% url 'eliminar' value.producto_id %}?next=carrito" class="text-danger"><i class="fas fa-trash"></i></a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4"><p class="text-muted">El carrito está vacío.</p></div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <a href="{% url 'limpiar' %}" class="btn btn-sm btn-link text-danger">Vaciar Carrito</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Seguir Comprando</button>
+                    {% if request.session.carrito %}
+                        <a href="{% url 'checkout_carrito' %}" class="btn btn-vulcano">FINALIZAR COMPRA</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="calculadora" class="py-5 bg-white">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card calc-card shadow-lg p-4 border-0">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-flask fa-2x mb-2" style="color: var(--azul-vulcano);"></i>
+                            <h3 class="fw-bold" style="color: var(--azul-vulcano);">Calculadora de Mantenimiento</h3>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-4"><label class="small fw-bold">Largo (m)</label><input type="number" id="largo" class="form-control" oninput="calcular()"></div>
+                            <div class="col-4"><label class="small fw-bold">Ancho (m)</label><input type="number" id="ancho" class="form-control" oninput="calcular()"></div>
+                            <div class="col-4"><label class="small fw-bold">Prof. (m)</label><input type="number" id="prof" class="form-control" oninput="calcular()"></div>
+                        </div>
+                        <div class="res-box mt-4 p-3 rounded">
+                            <div class="d-flex justify-content-between mb-2"><span>Volumen:</span><span class="fw-bold"><span id="litros">0</span> L</span></div>
+                            <div class="d-flex justify-content-between mb-1"><span>Cloro Diario:</span><span class="fw-bold"><span id="cloro">0</span> gr/ml</span></div>
+                            <div class="d-flex justify-content-between mb-1 border-top pt-1"><span>Pastillas (semana):</span><span class="fw-bold text-info"><span id="pastillas">0</span> u.</span></div>
+                            <div class="d-flex justify-content-between border-top pt-1"><span>Shock:</span><span class="fw-bold"><span id="shock">0</span> gr/ml</span></div>
+                        </div>
+                        <div class="text-center mt-3"><a href="https://wa.me/3585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="nosotros" class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-4" style="color: var(--azul-vulcano);">Sobre Summer Piscinas</h2>
+            <p class="lead text-muted mx-auto" style="max-width: 800px;">Expertos en piletas en Río Cuarto. Brindamos asesoramiento técnico y los mejores insumos para que tu única preocupación sea disfrutar del agua.</p>
+        </div>
+    </section>
+
+    <footer id="contacto" class="bg-dark text-white pt-5 pb-3">
+        <div class="container text-center">
+            <div class="row text-md-start">
+                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">SUMMER PISCINAS</h5><p class="small text-muted">Expertos en piletas en Río Cuarto.</p></div>
+                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">CONTACTO</h5><p class="small">3585615079<br>Río Cuarto, Cba.</p></div>
+                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">HORARIOS</h5><p class="small">Lunes a Viernes: 09-13 / 16-20</p></div>
+            </div>
+            <hr><p class="small text-muted">© 2026 Summer Piscinas</p>
+        </div>
+    </footer>
+
+    <script>
+        function calcular() {
+            let largo = document.getElementById('largo').value;
+            let ancho = document.getElementById('ancho').value;
+            let prof = document.getElementById('prof').value;
+            if (largo && ancho && prof) {
+                let vol = largo * ancho * prof * 1000;
+                document.getElementById('litros').innerText = Math.round(vol).toLocaleString();
+                document.getElementById('cloro').innerText = Math.round((vol / 10000) * 50);
+                document.getElementById('pastillas').innerText = Math.ceil(vol / 20000);
+                document.getElementById('shock').innerText = Math.round((vol / 10000) * 100);
+                document.getElementById('wacalc').href = `https://wa.me/3585615079?text=Hola! Necesito productos para una pileta de ${vol} litros.`;
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('show_carrito') === '1') {
+                var myModal = new bootstrap.Modal(document.getElementById('modalCarrito'));
+                myModal.show();
+            }
+        });
+    </script>
+</body>
+</html>
