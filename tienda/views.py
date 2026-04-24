@@ -23,33 +23,25 @@ def home(request):
     return render(request, 'tienda/index.html', context)
 
 def ver_categoria(request, nombre_cat):
-    # 1. Normalizamos el nombre que viene de la URL
-    term = nombre_cat.lower()
-
-    # 2. Buscamos la categoría de forma "borrosa"
-    # Esto busca cualquier categoría que tenga una parte de la palabra
-    if "pilet" in term or "piscin" in term:
-        # Busca productos cuya categoría contenga "piscin" o "pilet"
-        productos = Producto.objects.filter(
-            Q(categoria__nombre__icontains="piscin") | 
-            Q(categoria__nombre__icontains="pilet")
-        )
-    elif "equip" in term:
-        productos = Producto.objects.filter(categoria__nombre__icontains="equip")
-    elif "limp" in term:
-        productos = Producto.objects.filter(categoria__nombre__icontains="limp")
-    else:
-        # Si no es ninguna de las anteriores, intenta búsqueda exacta
-        productos = Producto.objects.filter(categoria__nombre__icontains=nombre_cat)
-
-    # 3. Filtro de búsqueda (Lupita)
+    # Traducción exacta según tu captura de pantalla del Admin
+    traductor = {
+        'Piletas': 'Productos para piscinas',
+        'Equipamiento': 'Equipamiento para piscinas',
+        'Limpieza': 'Limpieza'
+    }
+    
+    nombre_en_admin = traductor.get(nombre_cat, nombre_cat)
+    
+    # Buscamos los productos
+    productos = Producto.objects.filter(categoria__nombre__icontains=nombre_en_admin)
+    
+    # Buscador de la lupita
     query = request.GET.get('buscar')
     if query:
         productos = productos.filter(nombre__icontains=query)
-
-    # 4. Renderizamos (IMPORTANTE: Asegurate que el nombre del template sea este)
+        
     return render(request, 'tienda/categoria.html', {
-        'productos': productos.distinct(),
+        'productos': productos,
         'titulo': nombre_cat
     })
 
