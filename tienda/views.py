@@ -1,18 +1,18 @@
 import mercadopago
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Producto, Pedido, DetallePedido
+from .models import Producto, Pedido, DetallePedido, Categoria # Asegúrate de importar Categoria
 from .carrito import Carrito
+from django.db.models import Q
 
 def home(request):
-    # Usamos los nombres EXACTOS de tu panel de admin
-    # "Limpieza" -> OK
+    # Usamos icontains para que sea flexible con mayúsculas/minúsculas
+    # "Limpieza" traerá "Productos de Limpieza", "limpieza", etc.
     limpieza = Producto.objects.filter(categoria__nombre__icontains="Limpieza")[:4]
     
-    # Cambiamos "Piletas" por "Piscinas" para que coincida con "Productos para piscinas"
-    piletas = Producto.objects.filter(categoria__nombre__icontains="Piscinas")[:4]
+    # "Piscin" en singular es mejor porque agarra "Piscina", "Piscinas", "Piletas"
+    piletas = Producto.objects.filter(categoria__nombre__icontains="Piscin")[:4]
     
-    # "Equipamiento" -> Coincide con "Equipamiento para piscinas"
     equipamiento = Producto.objects.filter(categoria__nombre__icontains="Equipamiento")[:4]
 
     context = {
@@ -23,16 +23,33 @@ def home(request):
     return render(request, 'tienda/index.html', context)
 
 def ver_categoria(request, nombre_cat):
-    # Esta vista es para la página independiente de cada sección
-    productos = Producto.objects.filter(categoria__nombre__icontains=nombre_cat)
-    
-    # Si alguien busca dentro de la categoría
-    busqueda = request.GET.get('buscar')
-    if busqueda:
-        productos = productos.filter(nombre__icontains=busqueda)
+    # 1. Normalizamos el nombre que viene de la URL
+    term = nombre_cat.lower()
 
+    # 2. Buscamos la categoría de forma "borrosa"
+    # Esto busca cualquier categoría que tenga una parte de la palabra
+    if "pilet" in term or "piscin" in term:
+        # Busca productos cuya categoría contenga "piscin" o "pilet"
+        productos = Producto.objects.filter(
+            Q(categoria__nombre__icontains="piscin") | 
+            Q(categoria__nombre__icontains="pilet")
+        )
+    elif "equip" in term:
+        productos = Producto.objects.filter(categoria__nombre__icontains="equip")
+    elif "limp" in term:
+        productos = Producto.objects.filter(categoria__nombre__icontains="limp")
+    else:
+        # Si no es ninguna de las anteriores, intenta búsqueda exacta
+        productos = Producto.objects.filter(categoria__nombre__icontains=nombre_cat)
+
+    # 3. Filtro de búsqueda (Lupita)
+    query = request.GET.get('buscar')
+    if query:
+        productos = productos.filter(nombre__icontains=query)
+
+    # 4. Renderizamos (IMPORTANTE: Asegurate que el nombre del template sea este)
     return render(request, 'tienda/categoria.html', {
-        'productos': productos,
+        'productos': productos.distinct(),
         'titulo': nombre_cat
     })
 
@@ -47,7 +64,6 @@ def agregar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
     
-    # Manejo de redirección dinámica para no cerrar el modal
     if request.GET.get('next') == 'carrito':
         return redirect(request.META.get('HTTP_REFERER', 'home') + '?show_carrito=1')
     return redirect(request.META.get('HTTP_REFERER', 'home'))
@@ -75,13 +91,16 @@ def limpiar_carrito(request):
     carrito.limpiar()
     return redirect(request.META.get('HTTP_REFERER', 'home'))
 
-# --- CHECKOUT PARA CARRITO COMPLETO (CON FORMULARIO) ---
+# --- CHECKOUT Y MERCADO PAGO ---
 
 def checkout_carrito(request):
+    carrito_instancia = Carrito(request)
     carrito_session = request.session.get("carrito", {})
+    
     if not carrito_session:
         return redirect('home')
 
+    # Calculamos el total de forma segura
     total_carrito = sum(float(item['total']) for item in carrito_session.values())
 
     if request.method == 'POST':
@@ -116,38 +135,43 @@ def checkout_carrito(request):
             })
 
         if metodo == 'MP':
-            sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-            preference_data = {
-                "items": items_mp,
-                "back_urls": {
-                    "success": request.build_absolute_uri('/'),
-                    "failure": request.build_absolute_uri('/'),
-                    "pending": request.build_absolute_uri('/'),
-                },
-                "auto_return": "approved",
-                "binary_mode": True,
-            }
+            try:
+                sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+                preference_data = {
+                    "items": items_mp,
+                    "back_urls": {
+                        "success": request.build_absolute_uri('/'),
+                        "failure": request.build_absolute_uri('/'),
+                        "pending": request.build_absolute_uri('/'),
+                    },
+                    "auto_return": "approved",
+                    "binary_mode": True,
+                    "statement_descriptor": "SUMMER PISCINAS",
+                }
 
-            preference_response = sdk.preference().create(preference_data)
-            preference = preference_response.get("response")
+                preference_response = sdk.preference().create(preference_data)
+                preference = preference_response.get("response")
 
-            if preference and "id" in preference:
-                pedido.mp_preference_id = preference["id"]
-                pedido.save()
-                request.session['carrito'] = {}
-                return redirect(preference["init_point"])
-            else:
+                if preference and "id" in preference:
+                    pedido.mp_preference_id = preference["id"]
+                    pedido.save()
+                    carrito_instancia.limpiar() # Limpiamos carrito antes de redirigir
+                    return redirect(preference["init_point"])
+                else:
+                    raise Exception("Respuesta inválida de MP")
+            except Exception as e:
                 return render(request, 'tienda/checkout_carrito.html', {
                     'total_carrito': total_carrito,
-                    'error': 'Error de comunicación con Mercado Pago.'
+                    'error': f'Error con Mercado Pago: {str(e)}'
                 })
         else:
-            request.session['carrito'] = {}
+            carrito_instancia.limpiar()
             return render(request, 'tienda/gracias_transferencia.html', {'pedido': pedido})
 
     return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito})
 
 def procesar_compra(request, producto_id):
+    """Vista para compra rápida de un solo producto"""
     producto = get_object_or_404(Producto, id=producto_id)
     
     if request.method == 'POST':
@@ -173,22 +197,34 @@ def procesar_compra(request, producto_id):
         )
         
         if metodo == 'MP':
-            sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-            preference_data = {
-                "items": [{"title": str(producto.nombre), "quantity": 1, "unit_price": float(producto.precio), "currency_id": "ARS"}],
-                "back_urls": {"success": request.build_absolute_uri('/'), "failure": request.build_absolute_uri('/'), "pending": request.build_absolute_uri('/')},
-                "auto_return": "approved",
-                "binary_mode": True,
-            }
-            preference_response = sdk.preference().create(preference_data)
-            preference = preference_response.get("response")
-            
-            if preference and "id" in preference:
-                pedido.mp_preference_id = preference["id"]
-                pedido.save()
-                return redirect(preference["init_point"])
-            else:
-                return render(request, 'tienda/checkout.html', {'producto': producto, 'error': 'Error con Mercado Pago'})
+            try:
+                sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+                preference_data = {
+                    "items": [{
+                        "title": str(producto.nombre), 
+                        "quantity": 1, 
+                        "unit_price": float(producto.precio), 
+                        "currency_id": "ARS"
+                    }],
+                    "back_urls": {
+                        "success": request.build_absolute_uri('/'), 
+                        "failure": request.build_absolute_uri('/'), 
+                        "pending": request.build_absolute_uri('/')
+                    },
+                    "auto_return": "approved",
+                    "binary_mode": True,
+                }
+                preference_response = sdk.preference().create(preference_data)
+                preference = preference_response.get("response")
+                
+                if preference and "id" in preference:
+                    pedido.mp_preference_id = preference["id"]
+                    pedido.save()
+                    return redirect(preference["init_point"])
+                else:
+                    raise Exception("Error en preferencia")
+            except Exception as e:
+                return render(request, 'tienda/checkout.html', {'producto': producto, 'error': 'No se pudo conectar con Mercado Pago'})
         else:
             return render(request, 'tienda/gracias_transferencia.html', {'pedido': pedido})
             
