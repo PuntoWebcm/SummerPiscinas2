@@ -1,3 +1,4 @@
+{% load static %}
 {% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
@@ -5,9 +6,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summer Piscinas | Equipamiento para piletas</title>
+    
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <style>
         :root {
@@ -16,7 +22,7 @@
             --gris-claro: #f4f7f6;
         }
 
-        body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: smooth; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: smooth; overflow-x: hidden; }
 
         /* Navbar */
         .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
@@ -68,13 +74,13 @@
             border: 2px solid white;
         }
 
-        /* Hero */
+        /* Hero Mejorado */
         .hero { 
             background: linear-gradient(rgba(0,51,102,0.8), rgba(0,51,102,0.8)), url('https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 100px 0;
+            padding: 140px 0; /* Más aire arriba y abajo */
         }
 
         /* Tarjetas */
@@ -140,7 +146,7 @@
         {% endif %}
     </button>
 
-    <header class="hero text-center">
+    <header class="hero text-center" data-aos="fade-in">
         <div class="container">
             <h1 class="display-3 fw-bold">Soluciones para tu Piscina</h1>
             <p class="lead">Calidad profesional en mantenimiento y equipamiento.</p>
@@ -152,7 +158,7 @@
         <div class="container">
             <div class="text-center mb-5"><h2 class="fw-bold" style="color: var(--azul-vulcano);">Nuestros Servicios Profesionales</h2></div>
             <div class="row g-4 text-center">
-                <div class="col-md-6">
+                <div class="col-md-6" data-aos="fade-right">
                     <div class="card h-100 service-card shadow-sm p-4">
                         <i class="fas fa-tools fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Reparación de Equipos</h4>
@@ -160,7 +166,7 @@
                         <a href="https://wa.me/3586029520" target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6" data-aos="fade-left">
                     <div class="card h-100 service-card shadow-sm p-4">
                         <i class="fas fa-hand-sparkles fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Limpieza y Mantenimiento</h4>
@@ -174,7 +180,7 @@
 
     <main id="catalogo" class="container my-5">
         
-        <div class="row mb-5">
+        <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 class="section-title mb-0">Limpieza</h3>
                 <a href="{% url 'ver_categoria' 'Limpieza' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
@@ -201,7 +207,7 @@
             {% endfor %}
         </div>
 
-        <div class="row mb-5">
+        <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 class="section-title mb-0">Productos para Piscinas</h3>
                 <a href="{% url 'ver_categoria' 'Piscinas' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
@@ -228,7 +234,7 @@
             {% endfor %}
         </div>
 
-        <div class="row mb-5">
+        <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 class="section-title mb-0">Equipamiento</h3>
                 <a href="{% url 'ver_categoria' 'Equipamiento' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
@@ -304,7 +310,7 @@
     </div>
 
     <section id="calculadora" class="py-5 bg-white">
-        <div class="container">
+        <div class="container" data-aos="zoom-in">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="card calc-card shadow-lg p-4 border-0">
@@ -331,7 +337,7 @@
     </section>
 
     <section id="nosotros" class="py-5 bg-light">
-        <div class="container text-center">
+        <div class="container text-center" data-aos="fade-up">
             <h2 class="fw-bold mb-4" style="color: var(--azul-vulcano);">Sobre Summer Piscinas</h2>
             <p class="lead text-muted mx-auto" style="max-width: 800px;">Expertos en piletas en Río Cuarto. Brindamos asesoramiento técnico y los mejores insumos para que tu única preocupación sea disfrutar del agua.</p>
         </div>
@@ -364,6 +370,15 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 1000,
+        once: true,
+      });
+    </script>
+
     <script>
         window.addEventListener('DOMContentLoaded', (event) => {
             const urlParams = new URLSearchParams(window.location.search);
