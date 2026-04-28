@@ -12,7 +12,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <style>
@@ -74,13 +73,13 @@
             border: 2px solid white;
         }
 
-        /* Hero Mejorado */
+        /* Hero */
         .hero { 
             background: linear-gradient(rgba(0,51,102,0.8), rgba(0,51,102,0.8)), url('https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 140px 0; /* Más aire arriba y abajo */
+            padding: 140px 0;
         }
 
         /* Tarjetas */
@@ -166,14 +165,15 @@
                         <i class="fas fa-tools fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Reparación de Equipos</h4>
                         <p class="text-muted small">Arreglo de bombas y automatización con repuestos originales.</p>
-                        <a href="https://wa.me/5493586029520?text=Hola!%20Necesito%20solicitar%20un%20técnico%20para%20mi%20piscina." target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
+                        <a href="https://wa.me/543586029520?text=Hola!%20Necesito%20solicitar%20un%20técnico%20para%20mi%20piscina." target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
+                    </div>
                 </div>
                 <div class="col-md-6" data-aos="fade-left">
                     <div class="card h-100 service-card shadow-sm p-4">
                         <i class="fas fa-hand-sparkles fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Limpieza y Mantenimiento</h4>
                         <p class="text-muted small">Servicio especializado para que tu pileta esté siempre lista.</p>
-                        <a href="https://wa.me/5493586029520?text=Hola!%20Me%20gustaría%20pedir%20un%20presupuesto%20para%20el%20mantenimiento%20de%20mi%20pileta." target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
+                        <a href="https://wa.me/543586029520?text=Hola!%20Me%20gustaría%20pedir%20un%20presupuesto%20para%20el%20mantenimiento%20de%20mi%20pileta." target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
                     </div>
                 </div>
             </div>
@@ -205,7 +205,7 @@
                 </div>
             </div>
             {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados en Limpieza.</p></div>
+            <div class="col-12 text-center"><p class="text-muted">No hay productos en Limpieza.</p></div>
             {% endfor %}
         </div>
 
@@ -232,7 +232,7 @@
                 </div>
             </div>
             {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados en esta sección.</p></div>
+            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados aquí.</p></div>
             {% endfor %}
         </div>
 
@@ -259,10 +259,9 @@
                 </div>
             </div>
             {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados en Equipamiento.</p></div>
+            <div class="col-12 text-center"><p class="text-muted">No hay productos en Equipamiento.</p></div>
             {% endfor %}
         </div>
-
     </main>
 
     <div class="modal fade" id="modalCarrito" tabindex="-1" aria-hidden="true">
@@ -331,7 +330,9 @@
                             <div class="d-flex justify-content-between mb-1 border-top pt-1"><span>Pastillas (semana):</span><span class="fw-bold text-info"><span id="pastillas">0</span> u.</span></div>
                             <div class="d-flex justify-content-between border-top pt-1"><span>Shock:</span><span class="fw-bold"><span id="shock">0</span> gr/ml</span></div>
                         </div>
-                        <div class="text-center mt-3"><a href="https://wa.me/5493585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a></div>
+                        <div class="text-center mt-3">
+                            <a href="https://wa.me/543585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -349,39 +350,40 @@
         <div class="container text-center">
             <div class="row text-md-start">
                 <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">SUMMER PISCINAS</h5><p class="small text-muted">Expertos en piletas en Río Cuarto.</p></div>
-                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">CONTACTO</h5><p class="small">3585615079<br>Río Cuarto, Cba.</p></div>
+                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">CONTACTO</h5><p class="small">358 5615079<br>Río Cuarto, Cba.</p></div>
                 <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">HORARIOS</h5><p class="small">Lunes a Viernes: 09-13 / 16-20</p></div>
             </div>
             <hr><p class="small text-muted">© 2026 Summer Piscinas</p>
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
     <script>
+        // Inicializar AOS
+        AOS.init({ duration: 1000, once: true });
+
+        // Lógica de la calculadora
         function calcular() {
             let largo = document.getElementById('largo').value;
             let ancho = document.getElementById('ancho').value;
             let prof = document.getElementById('prof').value;
+            
             if (largo && ancho && prof) {
-                let vol = largo * ancho * prof * 1000;
-                document.getElementById('litros').innerText = Math.round(vol).toLocaleString();
+                let vol = Math.round(largo * ancho * prof * 1000);
+                document.getElementById('litros').innerText = vol.toLocaleString();
                 document.getElementById('cloro').innerText = Math.round((vol / 10000) * 50);
                 document.getElementById('pastillas').innerText = Math.ceil(vol / 20000);
                 document.getElementById('shock').innerText = Math.round((vol / 10000) * 100);
-                // Corrección del link de WhatsApp con formato internacional
-                document.getElementById('wacalc').href = `https://wa.me/5493585615079?text=Hola!...`;
+                
+                // Actualizar Link de WhatsApp (Sin el 9)
+                let texto = `Hola Summer Piscinas! Mi pileta tiene ${vol} litros y necesito productos para mantenimiento.`;
+                document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(texto)}`;
+            }
         }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-      AOS.init({
-        duration: 1000,
-        once: true,
-      });
-    </script>
 
-    <script>
+        // Abrir modal de carrito si viene de una acción de agregar/quitar
         window.addEventListener('DOMContentLoaded', (event) => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('show_carrito') === '1') {
