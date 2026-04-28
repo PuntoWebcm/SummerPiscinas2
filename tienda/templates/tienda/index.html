@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -186,7 +187,7 @@
                         <span class="category-badge mb-1">{{ p.categoria.nombre }}</span>
                         <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
                         <div class="mt-auto">
-                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
                                 <a href="{% url 'agregar' p.id %}" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
@@ -213,7 +214,7 @@
                         <span class="category-badge mb-1">{{ p.categoria.nombre }}</span>
                         <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
                         <div class="mt-auto">
-                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
                                 <a href="{% url 'agregar' p.id %}" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
@@ -240,7 +241,7 @@
                         <span class="category-badge mb-1">{{ p.categoria.nombre }}</span>
                         <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6>
                         <div class="mt-auto">
-                            <p class="h6 fw-bold text-dark">${{ p.precio }}</p>
+                            <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
                                 <a href="{% url 'agregar' p.id %}" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
@@ -272,7 +273,7 @@
                                 {% for key, value in request.session.carrito.items %}
                                 <tr>
                                     <td class="text-start small">{{ value.nombre }}</td>
-                                    <td>${{ value.precio }}</td>
+                                    <td>$ {{ value.precio|intcomma }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <a href="{% url 'restar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">-</a>
@@ -280,7 +281,7 @@
                                             <a href="{% url 'agregar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">+</a>
                                         </div>
                                     </td>
-                                    <td class="fw-bold">${{ value.total }}</td>
+                                    <td class="fw-bold">$ {{ value.total|intcomma }}</td>
                                     <td><a href="{% url 'eliminar' value.producto_id %}?next=carrito" class="text-danger"><i class="fas fa-trash"></i></a></td>
                                 </tr>
                                 {% endfor %}

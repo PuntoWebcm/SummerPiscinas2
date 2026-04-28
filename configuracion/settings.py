@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'tienda',
 ]
 
@@ -120,6 +121,13 @@ TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 
 USE_TZ = True
+
+USE_L10N = True
+
+# Configuraciones para el formato de moneda argentina
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
 
 
 ## Static files (CSS, JavaScript, Images)

@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -52,7 +53,8 @@
                 </nav>
                 
                 <h1 class="display-5 fw-bold mb-3" style="color: var(--azul-vulcano);">{{ producto.nombre|upper }}</h1>
-                <p class="price-tag mb-4">${{ producto.precio }}</p>
+                
+                <p class="price-tag mb-4">$ {{ producto.precio|intcomma }}</p>
                 
                 <div class="mb-4">
                     <h5 class="fw-bold">Descripción:</h5>
