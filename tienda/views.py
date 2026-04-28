@@ -56,27 +56,33 @@ def agregar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
     
-    if request.GET.get('next') == 'carrito':
-        return redirect(request.META.get('HTTP_REFERER', 'home') + '?show_carrito=1')
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+    referer = request.META.get('HTTP_REFERER', '/')
+    if request.GET.get('show_carrito') == '1':
+        sep = '&' if '?' in referer else '?'
+        return redirect(referer + f'{sep}show_carrito=1')
+    return redirect(referer)
 
 def eliminar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.eliminar(producto)
     
-    if request.GET.get('next') == 'carrito':
-        return redirect(request.META.get('HTTP_REFERER', 'home') + '?show_carrito=1')
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+    referer = request.META.get('HTTP_REFERER', '/')
+    if request.GET.get('show_carrito') == '1':
+        sep = '&' if '?' in referer else '?'
+        return redirect(referer + f'{sep}show_carrito=1')
+    return redirect(referer)
 
 def restar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.restar(producto)
     
-    if request.GET.get('next') == 'carrito':
-        return redirect(request.META.get('HTTP_REFERER', 'home') + '?show_carrito=1')
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+    referer = request.META.get('HTTP_REFERER', '/')
+    if request.GET.get('show_carrito') == '1':
+        sep = '&' if '?' in referer else '?'
+        return redirect(referer + f'{sep}show_carrito=1')
+    return redirect(referer)
 
 def limpiar_carrito(request):
     carrito = Carrito(request)

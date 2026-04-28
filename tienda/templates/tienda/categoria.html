@@ -145,13 +145,13 @@
                                     <td class="text-start small">{{ value.nombre }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{% url 'restar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">-</a>
+                                            <a href="{% url 'restar' value.producto_id %}?show_carrito=1#productos-seccion" class="btn btn-outline-secondary">-</a>
                                             <span class="px-2">{{ value.cantidad }}</span>
-                                            <a href="{% url 'agregar' value.producto_id %}?next=carrito" class="btn btn-outline-secondary">+</a>
+                                            <a href="{% url 'agregar' value.producto_id %}?show_carrito=1#productos-seccion" class="btn btn-outline-secondary">+</a>
                                         </div>
                                     </td>
                                     <td class="fw-bold">$ {{ value.total|intcomma }}</td>
-                                    <td><a href="{% url 'eliminar' value.producto_id %}?next=carrito" class="text-danger"><i class="fas fa-trash"></i></a></td>
+                                    <td><a href="{% url 'eliminar' value.producto_id %}?show_carrito=1#productos-seccion" class="text-danger"><i class="fas fa-trash"></i></a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
