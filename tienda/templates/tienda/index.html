@@ -84,8 +84,11 @@
         }
 
         /* Tarjetas */
-        .product-card, .service-card { border: none; border-radius: 0; transition: transform 0.3s; background: white; }
-        .product-card:hover, .service-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .product-card, .service-card { border: none; border-radius: 0; transition: all 0.3s ease-in-out; background: white; }
+        .product-card:hover, .service-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 12px 24px rgba(0, 51, 102, 0.15) !important; 
+        }
         .card-img-top { height: 180px; object-fit: contain; padding: 15px; background: white; }
         .category-badge { font-size: 0.65rem; color: var(--celeste-agua); text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
         
@@ -163,7 +166,7 @@
                         <i class="fas fa-tools fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Reparación de Equipos</h4>
                         <p class="text-muted small">Arreglo de bombas y automatización con repuestos originales.</p>
-                        <a href="https://wa.me/3586029520" target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
+                        <a href="https://wa.me/5493586029520" target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
                     </div>
                 </div>
                 <div class="col-md-6" data-aos="fade-left">
@@ -171,7 +174,7 @@
                         <i class="fas fa-hand-sparkles fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Limpieza y Mantenimiento</h4>
                         <p class="text-muted small">Servicio especializado para que tu pileta esté siempre lista.</p>
-                        <a href="https://wa.me/3586029520" target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
+                        <a href="https://wa.me/5493586029520" target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
                     </div>
                 </div>
             </div>
@@ -196,7 +199,7 @@
                             <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
-                                <a href="{% url 'agregar' p.id %}#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                                <a href="{% url 'agregar' p.id %}?show_carrito=1#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
@@ -223,7 +226,7 @@
                             <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
-                                <a href="{% url 'agregar' p.id %}#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                                <a href="{% url 'agregar' p.id %}?show_carrito=1#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
@@ -250,7 +253,7 @@
                             <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
-                                <a href="{% url 'agregar' p.id %}#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                                <a href="{% url 'agregar' p.id %}?show_carrito=1#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
@@ -329,7 +332,7 @@
                             <div class="d-flex justify-content-between mb-1 border-top pt-1"><span>Pastillas (semana):</span><span class="fw-bold text-info"><span id="pastillas">0</span> u.</span></div>
                             <div class="d-flex justify-content-between border-top pt-1"><span>Shock:</span><span class="fw-bold"><span id="shock">0</span> gr/ml</span></div>
                         </div>
-                        <div class="text-center mt-3"><a href="https://wa.me/3585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a></div>
+                        <div class="text-center mt-3"><a href="https://wa.me/5493585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a></div>
                     </div>
                 </div>
             </div>
@@ -365,7 +368,8 @@
                 document.getElementById('cloro').innerText = Math.round((vol / 10000) * 50);
                 document.getElementById('pastillas').innerText = Math.ceil(vol / 20000);
                 document.getElementById('shock').innerText = Math.round((vol / 10000) * 100);
-                document.getElementById('wacalc').href = `https://wa.me/3585615079?text=Hola! Necesito productos para una pileta de ${vol} litros.`;
+                // Corrección del link de WhatsApp con formato internacional
+                document.getElementById('wacalc').href = `https://wa.me/5493585615079?text=Hola! Necesito productos para una pileta de ${vol} litros.`;
             }
         }
     </script>
