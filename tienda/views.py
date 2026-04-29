@@ -13,12 +13,12 @@ def home(request):
     # "Piscin" en singular es mejor porque agarra "Piscina", "Piscinas", "Piletas"
     piletas = Producto.objects.filter(categoria__nombre__icontains="Piscin")[:4]
     
-    equipamiento = Producto.objects.filter(categoria__nombre__icontains="Equipamiento")[:4]
+    inflables = Producto.objects.filter(categoria__nombre__icontains="Inflables")[:4]
 
     context = {
         'limpieza': limpieza,
         'piletas': piletas,
-        'equipamiento': equipamiento,
+        'inflables': inflables,
     }
     return render(request, 'tienda/index.html', context)
 
@@ -26,7 +26,7 @@ def ver_categoria(request, nombre_cat):
     # Traducción exacta según tu captura de pantalla del Admin
     traductor = {
         'Piletas': 'Productos para piscinas',
-        'Equipamiento': 'Equipamiento para piscinas',
+        'Inflables': 'Inflables para piscinas',
         'Limpieza': 'Limpieza'
     }
     

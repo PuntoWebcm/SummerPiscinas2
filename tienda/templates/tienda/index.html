@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summer Piscinas | Equipamiento para piletas</title>
+    <title>Summer Piscinas | Inflables para piletas</title>
     
     <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
 
@@ -129,7 +129,7 @@
                         <ul class="dropdown-menu" aria-labelledby="prodDropdown">
                             <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Limpieza' %}">Limpieza</a></li>
                             <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Piscinas' %}">Productos para piscinas</a></li>
-                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Equipamiento' %}">Inflables</a></li>
+                            <li><a class="dropdown-item" href="{% url 'ver_categoria' 'Inflables' %}">Inflables</a></li>
                         </ul>
                     </li>
                     <li class="nav-item"><a class="nav-link fw-bold text-dark" href="#servicios">SERVICIOS</a></li>
@@ -238,10 +238,10 @@
 
         <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
-                <h3 class="section-title mb-0">Equipamiento</h3>
-                <a href="{% url 'ver_categoria' 'Equipamiento' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
+                <h3 class="section-title mb-0">Inflables</h3>
+                <a href="{% url 'ver_categoria' 'Inflables' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
             </div>
-            {% for p in equipamiento %}
+            {% for p in Inflables. %}
             <div class="col-6 col-md-3 mb-4">
                 <div class="card h-100 product-card shadow-sm border text-center">
                     {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %}
@@ -259,7 +259,7 @@
                 </div>
             </div>
             {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos en Equipamiento.</p></div>
+            <div class="col-12 text-center"><p class="text-muted">No hay productos en Inflables.</p></div>
             {% endfor %}
         </div>
     </main>
