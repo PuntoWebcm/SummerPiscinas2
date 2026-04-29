@@ -56,37 +56,36 @@ def agregar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
     
-    # Obtenemos la URL de donde venía el usuario y limpiamos anclas previas
-    referer = request.META.get('HTTP_REFERER', '/').split('#')[0]
+    referer = request.META.get('HTTP_REFERER', '/')
+    base_url = referer.split('#')[0].split('?')[0] # Limpiamos URL
     
     if request.GET.get('show_carrito') == '1':
-        sep = '&' if '?' in referer else '?'
-        return redirect(referer + f'{sep}show_carrito=1#catalogo')
-    return redirect(referer + '#catalogo')
+        return redirect(f"{base_url}?show_carrito=1#catalogo")
+    return redirect(f"{base_url}#catalogo")
 
 def eliminar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.eliminar(producto)
     
-    referer = request.META.get('HTTP_REFERER', '/').split('#')[0]
+    referer = request.META.get('HTTP_REFERER', '/')
+    base_url = referer.split('#')[0].split('?')[0]
     
     if request.GET.get('show_carrito') == '1':
-        sep = '&' if '?' in referer else '?'
-        return redirect(referer + f'{sep}show_carrito=1#catalogo')
-    return redirect(referer + '#catalogo')
+        return redirect(f"{base_url}?show_carrito=1#catalogo")
+    return redirect(f"{base_url}#catalogo")
 
 def restar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.restar(producto)
     
-    referer = request.META.get('HTTP_REFERER', '/').split('#')[0]
+    referer = request.META.get('HTTP_REFERER', '/')
+    base_url = referer.split('#')[0].split('?')[0]
     
     if request.GET.get('show_carrito') == '1':
-        sep = '&' if '?' in referer else '?'
-        return redirect(referer + f'{sep}show_carrito=1#catalogo')
-    return redirect(referer + '#catalogo')
+        return redirect(f"{base_url}?show_carrito=1#catalogo")
+    return redirect(f"{base_url}#catalogo")
 
 def limpiar_carrito(request):
     carrito = Carrito(request)
