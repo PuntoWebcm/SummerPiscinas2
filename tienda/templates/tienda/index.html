@@ -241,7 +241,7 @@
                 <h3 class="section-title mb-0">Inflables</h3>
                 <a href="{% url 'ver_categoria' 'Inflables' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
             </div>
-            {% for p in Inflables. %}
+            {% for p in inflables %}
             <div class="col-6 col-md-3 mb-4">
                 <div class="card h-100 product-card shadow-sm border text-center">
                     {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %}
@@ -361,10 +361,8 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
-        // Inicializar AOS
         AOS.init({ duration: 1000, once: true });
 
-        // Lógica de la calculadora
         function calcular() {
             let largo = document.getElementById('largo').value;
             let ancho = document.getElementById('ancho').value;
@@ -377,13 +375,11 @@
                 document.getElementById('pastillas').innerText = Math.ceil(vol / 20000);
                 document.getElementById('shock').innerText = Math.round((vol / 10000) * 100);
                 
-                // Actualizar Link de WhatsApp (Sin el 9)
                 let texto = `Hola Summer Piscinas! Mi pileta tiene ${vol} litros y necesito productos para mantenimiento.`;
                 document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(texto)}`;
             }
         }
 
-        // Abrir modal de carrito si viene de una acción de agregar/quitar
         window.addEventListener('DOMContentLoaded', (event) => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('show_carrito') === '1') {
