@@ -6,29 +6,40 @@ from .carrito import Carrito
 from django.db.models import Q
 
 def home(request):
+    # Filtros para las secciones de la Home
     limpieza = Producto.objects.filter(categoria__nombre__icontains="Limpieza")[:4]
     piletas = Producto.objects.filter(categoria__nombre__icontains="Piscin")[:4]
-    # Traemos los inflables
     inflables_list = Producto.objects.filter(categoria__nombre__icontains="Inflables")[:4]
 
     context = {
         'limpieza': limpieza,
         'piletas': piletas,
-        'inflables': inflables_list, # Usamos 'inflables' en minúscula
+        'inflables': inflables_list,
     }
     return render(request, 'tienda/index.html', context)
 
 def ver_categoria(request, nombre_cat):
-    traductor = {
-        'Piletas': 'Productos para piscinas',
-        'Inflables': 'Inflables para piscinas',
-        'Limpieza': 'Limpieza'
-    }
-    nombre_en_admin = traductor.get(nombre_cat, nombre_cat)
-    productos = Producto.objects.filter(categoria__nombre__icontains=nombre_en_admin)
+    """
+    Vista para ver todos los productos de una categoría.
+    Usa una búsqueda flexible para evitar errores de nombres exactos.
+    """
+    productos = Producto.objects.filter(categoria__nombre__icontains=nombre_cat)
+    
+    if not productos.exists():
+        traductor = {
+            'Piletas': 'Productos para piscinas',
+            'Inflables': 'Inflables para piscinas',
+            'Limpieza': 'Limpieza'
+        }
+        nombre_admin = traductor.get(nombre_cat, nombre_cat)
+        productos = Producto.objects.filter(categoria__nombre__icontains=nombre_admin)
+    
     query = request.GET.get('buscar')
     if query:
-        productos = productos.filter(nombre__icontains=query)
+        productos = productos.filter(
+            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+        )
+        
     return render(request, 'tienda/categoria.html', {
         'productos': productos,
         'titulo': nombre_cat
@@ -38,52 +49,67 @@ def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     return render(request, 'tienda/detalle.html', {'producto': producto})
 
+# --- GESTIÓN DEL CARRITO (CORREGIDO PARA EVITAR SALTOS) ---
+
 def agregar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
-    referer = request.META.get('HTTP_REFERER', '/')
+    
+    # Obtenemos la URL de donde venía el usuario y limpiamos anclas previas
+    referer = request.META.get('HTTP_REFERER', '/').split('#')[0]
+    
     if request.GET.get('show_carrito') == '1':
         sep = '&' if '?' in referer else '?'
-        return redirect(referer + f'{sep}show_carrito=1')
-    return redirect(referer)
+        return redirect(referer + f'{sep}show_carrito=1#catalogo')
+    return redirect(referer + '#catalogo')
 
 def eliminar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.eliminar(producto)
-    referer = request.META.get('HTTP_REFERER', '/')
+    
+    referer = request.META.get('HTTP_REFERER', '/').split('#')[0]
+    
     if request.GET.get('show_carrito') == '1':
         sep = '&' if '?' in referer else '?'
-        return redirect(referer + f'{sep}show_carrito=1')
-    return redirect(referer)
+        return redirect(referer + f'{sep}show_carrito=1#catalogo')
+    return redirect(referer + '#catalogo')
 
 def restar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.restar(producto)
-    referer = request.META.get('HTTP_REFERER', '/')
+    
+    referer = request.META.get('HTTP_REFERER', '/').split('#')[0]
+    
     if request.GET.get('show_carrito') == '1':
         sep = '&' if '?' in referer else '?'
-        return redirect(referer + f'{sep}show_carrito=1')
-    return redirect(referer)
+        return redirect(referer + f'{sep}show_carrito=1#catalogo')
+    return redirect(referer + '#catalogo')
 
 def limpiar_carrito(request):
     carrito = Carrito(request)
     carrito.limpiar()
-    return redirect(request.META.get('HTTP_REFERER', 'home'))
+    return redirect('home')
+
+# --- CHECKOUT Y MERCADO PAGO ---
 
 def checkout_carrito(request):
     carrito_instancia = Carrito(request)
     carrito_session = request.session.get("carrito", {})
+    
     if not carrito_session:
         return redirect('home')
+
     total_carrito = sum(float(item['total']) for item in carrito_session.values())
+
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         whatsapp = request.POST.get('whatsapp')
         metodo = request.POST.get('metodo_pago')
+
         pedido = Pedido.objects.create(
             nombre_completo=nombre,
             email=email,
@@ -92,6 +118,7 @@ def checkout_carrito(request):
             metodo_pago=metodo,
             estado_pago='PE'
         )
+        
         items_mp = []
         for item in carrito_session.values():
             prod_obj = Producto.objects.get(id=item['producto_id'])
@@ -107,6 +134,7 @@ def checkout_carrito(request):
                 "unit_price": float(item['precio']),
                 "currency_id": "ARS",
             })
+
         if metodo == 'MP':
             try:
                 sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
@@ -121,8 +149,10 @@ def checkout_carrito(request):
                     "binary_mode": True,
                     "statement_descriptor": "SUMMER PISCINAS",
                 }
+
                 preference_response = sdk.preference().create(preference_data)
                 preference = preference_response.get("response")
+
                 if preference and "id" in preference:
                     pedido.mp_preference_id = preference["id"]
                     pedido.save()
@@ -138,15 +168,18 @@ def checkout_carrito(request):
         else:
             carrito_instancia.limpiar()
             return render(request, 'tienda/gracias_transferencia.html', {'pedido': pedido})
+
     return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito})
 
 def procesar_compra(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
+    
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         whatsapp = request.POST.get('whatsapp')
         metodo = request.POST.get('metodo_pago')
+        
         pedido = Pedido.objects.create(
             nombre_completo=nombre,
             email=email,
@@ -155,12 +188,14 @@ def procesar_compra(request, producto_id):
             metodo_pago=metodo,
             estado_pago='PE'
         )
+        
         DetallePedido.objects.create(
             pedido=pedido,
             producto=producto,
             cantidad=1,
             precio_unitario=producto.precio
         )
+        
         if metodo == 'MP':
             try:
                 sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
@@ -181,6 +216,7 @@ def procesar_compra(request, producto_id):
                 }
                 preference_response = sdk.preference().create(preference_data)
                 preference = preference_response.get("response")
+                
                 if preference and "id" in preference:
                     pedido.mp_preference_id = preference["id"]
                     pedido.save()
@@ -191,4 +227,5 @@ def procesar_compra(request, producto_id):
                 return render(request, 'tienda/checkout.html', {'producto': producto, 'error': 'No se pudo conectar con Mercado Pago'})
         else:
             return render(request, 'tienda/gracias_transferencia.html', {'pedido': pedido})
+            
     return render(request, 'tienda/checkout.html', {'producto': producto})
