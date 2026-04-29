@@ -21,7 +21,7 @@
             --gris-claro: #f4f7f6;
         }
 
-        body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: smooth; overflow-x: hidden; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: auto !important; overflow-x: hidden; }
 
         /* Navbar */
         .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
@@ -165,7 +165,7 @@
                         <i class="fas fa-tools fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Reparación de Equipos</h4>
                         <p class="text-muted small">Arreglo de bombas y automatización con repuestos originales.</p>
-                        <a href="https://wa.me/543586029520?text=Hola!%20Necesito%20solicitar%20un%20técnico%20para%20mi%20piscina." target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
+                        <a href="https://wa.me/543586029520" target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a>
                     </div>
                 </div>
                 <div class="col-md-6" data-aos="fade-left">
@@ -173,7 +173,7 @@
                         <i class="fas fa-hand-sparkles fa-3x mb-3" style="color: var(--celeste-agua);"></i>
                         <h4 class="fw-bold">Limpieza y Mantenimiento</h4>
                         <p class="text-muted small">Servicio especializado para que tu pileta esté siempre lista.</p>
-                        <a href="https://wa.me/543586029520?text=Hola!%20Me%20gustaría%20pedir%20un%20presupuesto%20para%20el%20mantenimiento%20de%20mi%20pileta." target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
+                        <a href="https://wa.me/543586029520" target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a>
                     </div>
                 </div>
             </div>
@@ -185,7 +185,7 @@
         <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 class="section-title mb-0">Limpieza</h3>
-                <a href="{% url 'ver_categoria' 'Limpieza' %}#catalogo" class="btn btn-outline-azul btn-sm">Ver más</a>
+                <a href="{% url 'ver_categoria' 'Limpieza' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
             </div>
             {% for p in limpieza %}
             <div class="col-6 col-md-3 mb-4">
@@ -198,21 +198,19 @@
                             <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
-                                <a href="{% url 'agregar' p.id %}?show_carrito=1#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                                <a href="{% url 'agregar' p.id %}?show_carrito=1" class="btn btn-vulcano btn-sm flex-grow-1 mantener-scroll"><i class="fas fa-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos en Limpieza.</p></div>
             {% endfor %}
         </div>
 
         <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 class="section-title mb-0">Productos para Piscinas</h3>
-                <a href="{% url 'ver_categoria' 'Piscinas' %}#catalogo" class="btn btn-outline-azul btn-sm">Ver más</a>
+                <a href="{% url 'ver_categoria' 'Piscinas' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
             </div>
             {% for p in piletas %}
             <div class="col-6 col-md-3 mb-4">
@@ -225,21 +223,19 @@
                             <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
-                                <a href="{% url 'agregar' p.id %}?show_carrito=1#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                                <a href="{% url 'agregar' p.id %}?show_carrito=1" class="btn btn-vulcano btn-sm flex-grow-1 mantener-scroll"><i class="fas fa-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos destacados aquí.</p></div>
             {% endfor %}
         </div>
 
         <div class="row mb-5" data-aos="fade-up">
             <div class="col-12 d-flex justify-content-between align-items-center mb-3">
                 <h3 class="section-title mb-0">Inflables</h3>
-                <a href="{% url 'ver_categoria' 'Inflables' %}#catalogo" class="btn btn-outline-azul btn-sm">Ver más</a>
+                <a href="{% url 'ver_categoria' 'Inflables' %}" class="btn btn-outline-azul btn-sm">Ver más</a>
             </div>
             {% for p in inflables %}
             <div class="col-6 col-md-3 mb-4">
@@ -252,14 +248,12 @@
                             <p class="h6 fw-bold text-dark">$ {{ p.precio|intcomma }}</p>
                             <div class="d-flex gap-1">
                                 <a href="{% url 'detalle_producto' p.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">VER</a>
-                                <a href="{% url 'agregar' p.id %}?show_carrito=1#catalogo" class="btn btn-vulcano btn-sm flex-grow-1"><i class="fas fa-cart-plus"></i></a>
+                                <a href="{% url 'agregar' p.id %}?show_carrito=1" class="btn btn-vulcano btn-sm flex-grow-1 mantener-scroll"><i class="fas fa-cart-plus"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {% empty %}
-            <div class="col-12 text-center"><p class="text-muted">No hay productos en Inflables.</p></div>
             {% endfor %}
         </div>
     </main>
@@ -283,13 +277,13 @@
                                     <td>$ {{ value.precio|intcomma }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{% url 'restar' value.producto_id %}?show_carrito=1#catalogo" class="btn btn-outline-secondary">-</a>
+                                            <a href="{% url 'restar' value.producto_id %}?show_carrito=1" class="btn btn-outline-secondary mantener-scroll">-</a>
                                             <span class="px-2 py-1">{{ value.cantidad }}</span>
-                                            <a href="{% url 'agregar' value.producto_id %}?show_carrito=1#catalogo" class="btn btn-outline-secondary">+</a>
+                                            <a href="{% url 'agregar' value.producto_id %}?show_carrito=1" class="btn btn-outline-secondary mantener-scroll">+</a>
                                         </div>
                                     </td>
                                     <td class="fw-bold">$ {{ value.total|intcomma }}</td>
-                                    <td><a href="{% url 'eliminar' value.producto_id %}?show_carrito=1#catalogo" class="text-danger"><i class="fas fa-trash"></i></a></td>
+                                    <td><a href="{% url 'eliminar' value.producto_id %}?show_carrito=1" class="text-danger mantener-scroll"><i class="fas fa-trash"></i></a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -326,9 +320,6 @@
                         </div>
                         <div class="res-box mt-4 p-3 rounded">
                             <div class="d-flex justify-content-between mb-2"><span>Volumen:</span><span class="fw-bold"><span id="litros">0</span> L</span></div>
-                            <div class="d-flex justify-content-between mb-1"><span>Cloro Diario:</span><span class="fw-bold"><span id="cloro">0</span> gr/ml</span></div>
-                            <div class="d-flex justify-content-between mb-1 border-top pt-1"><span>Pastillas (semana):</span><span class="fw-bold text-info"><span id="pastillas">0</span> u.</span></div>
-                            <div class="d-flex justify-content-between border-top pt-1"><span>Shock:</span><span class="fw-bold"><span id="shock">0</span> gr/ml</span></div>
                         </div>
                         <div class="text-center mt-3">
                             <a href="https://wa.me/543585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a>
@@ -339,21 +330,9 @@
         </div>
     </section>
 
-    <section id="nosotros" class="py-5 bg-light">
-        <div class="container text-center" data-aos="fade-up">
-            <h2 class="fw-bold mb-4" style="color: var(--azul-vulcano);">Sobre Summer Piscinas</h2>
-            <p class="lead text-muted mx-auto" style="max-width: 800px;">Expertos en piletas en Río Cuarto. Brindamos asesoramiento técnico y los mejores insumos para que tu única preocupación sea disfrutar del agua.</p>
-        </div>
-    </section>
-
     <footer id="contacto" class="bg-dark text-white pt-5 pb-3">
         <div class="container text-center">
-            <div class="row text-md-start">
-                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">SUMMER PISCINAS</h5><p class="small text-muted">Expertos en piletas en Río Cuarto.</p></div>
-                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">CONTACTO</h5><p class="small">358 5615079<br>Río Cuarto, Cba.</p></div>
-                <div class="col-md-4 mb-3"><h5 class="fw-bold" style="color: var(--celeste-agua);">HORARIOS</h5><p class="small">Lunes a Viernes: 09-13 / 16-20</p></div>
-            </div>
-            <hr><p class="small text-muted">© 2026 Summer Piscinas</p>
+            <p class="small text-muted">© 2026 Summer Piscinas</p>
         </div>
     </footer>
 
@@ -363,24 +342,34 @@
     <script>
         AOS.init({ duration: 1000, once: true });
 
+        // --- LÓGICA PARA EVITAR EL SALTO ARRIBA ---
+        // Al hacer clic, guardamos la posición actual
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.mantener-scroll')) {
+                localStorage.setItem('posicion_scroll', window.scrollY);
+            }
+        });
+
+        // Al cargar la página, si hay una posición guardada, volvemos ahí
+        window.addEventListener('load', function() {
+            const pos = localStorage.getItem('posicion_scroll');
+            if (pos) {
+                window.scrollTo(0, parseInt(pos));
+                localStorage.removeItem('posicion_scroll'); // Limpiamos para la próxima
+            }
+        });
+
         function calcular() {
             let largo = document.getElementById('largo').value;
             let ancho = document.getElementById('ancho').value;
             let prof = document.getElementById('prof').value;
-            
             if (largo && ancho && prof) {
                 let vol = Math.round(largo * ancho * prof * 1000);
                 document.getElementById('litros').innerText = vol.toLocaleString();
-                document.getElementById('cloro').innerText = Math.round((vol / 10000) * 50);
-                document.getElementById('pastillas').innerText = Math.ceil(vol / 20000);
-                document.getElementById('shock').innerText = Math.round((vol / 10000) * 100);
-                
-                let texto = `Hola Summer Piscinas! Mi pileta tiene ${vol} litros y necesito productos para mantenimiento.`;
-                document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(texto)}`;
             }
         }
 
-        window.addEventListener('DOMContentLoaded', (event) => {
+        window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('show_carrito') === '1') {
                 var myModal = new bootstrap.Modal(document.getElementById('modalCarrito'));

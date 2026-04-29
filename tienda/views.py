@@ -21,7 +21,6 @@ def home(request):
 def ver_categoria(request, nombre_cat):
     """
     Vista para ver todos los productos de una categoría.
-    Usa una búsqueda flexible para evitar errores de nombres exactos.
     """
     productos = Producto.objects.filter(categoria__nombre__icontains=nombre_cat)
     
@@ -49,7 +48,7 @@ def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     return render(request, 'tienda/detalle.html', {'producto': producto})
 
-# --- GESTIÓN DEL CARRITO (CORREGIDO PARA EVITAR SALTOS) ---
+# --- GESTIÓN DEL CARRITO ---
 
 def agregar_producto(request, producto_id):
     carrito = Carrito(request)
@@ -57,11 +56,10 @@ def agregar_producto(request, producto_id):
     carrito.agregar(producto)
     
     referer = request.META.get('HTTP_REFERER', '/')
-    base_url = referer.split('#')[0].split('?')[0] # Limpiamos URL
-    
     if request.GET.get('show_carrito') == '1':
-        return redirect(f"{base_url}?show_carrito=1#catalogo")
-    return redirect(f"{base_url}#catalogo")
+        sep = '&' if '?' in referer else '?'
+        return redirect(referer + f'{sep}show_carrito=1')
+    return redirect(referer)
 
 def eliminar_producto(request, producto_id):
     carrito = Carrito(request)
@@ -69,11 +67,10 @@ def eliminar_producto(request, producto_id):
     carrito.eliminar(producto)
     
     referer = request.META.get('HTTP_REFERER', '/')
-    base_url = referer.split('#')[0].split('?')[0]
-    
     if request.GET.get('show_carrito') == '1':
-        return redirect(f"{base_url}?show_carrito=1#catalogo")
-    return redirect(f"{base_url}#catalogo")
+        sep = '&' if '?' in referer else '?'
+        return redirect(referer + f'{sep}show_carrito=1')
+    return redirect(referer)
 
 def restar_producto(request, producto_id):
     carrito = Carrito(request)
@@ -81,11 +78,10 @@ def restar_producto(request, producto_id):
     carrito.restar(producto)
     
     referer = request.META.get('HTTP_REFERER', '/')
-    base_url = referer.split('#')[0].split('?')[0]
-    
     if request.GET.get('show_carrito') == '1':
-        return redirect(f"{base_url}?show_carrito=1#catalogo")
-    return redirect(f"{base_url}#catalogo")
+        sep = '&' if '?' in referer else '?'
+        return redirect(referer + f'{sep}show_carrito=1')
+    return redirect(referer)
 
 def limpiar_carrito(request):
     carrito = Carrito(request)
