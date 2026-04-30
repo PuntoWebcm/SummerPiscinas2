@@ -90,7 +90,7 @@
          .btn-vulcano { background-color: var(--azul-vulcano); color: white; border-radius: 0; font-weight: bold; transition: 0.3s; } 
          .btn-vulcano:hover { background-color: var(--celeste-agua); color: white; } 
 
-         .btn-outline-azul { border: 2px solid var(--azul-vulcano); color: var(--azul-vulcano); font-weight: bold; border-radius: 0; } 
+         .btn-outline-azul { border: 2px solid var(--azul-vulcano); color: var(--azul-vulcano); font-weight: bold; border-radius: 0; text-decoration: none; } 
           
          .section-title { 
              color: var(--azul-vulcano); 
@@ -155,7 +155,7 @@
                          <i class="fas fa-tools fa-3x mb-3" style="color: var(--celeste-agua);"></i> 
                          <h4 class="fw-bold">Reparación de Equipos</h4> 
                          <p class="text-muted small">Arreglo de bombas y automatización con repuestos originales.</p> 
-                         <a href="https://wa.me/543586029520" target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a> 
+                         <a href="https://wa.me/543586029520?text=Hola!%20Necesito%20solicitar%20un%20técnico%20para%20reparación%20de%20equipos." target="_blank" class="btn btn-outline-azul mt-auto">SOLICITAR TÉCNICO</a> 
                      </div> 
                  </div> 
                  <div class="col-md-6" data-aos="fade-left"> 
@@ -163,7 +163,7 @@
                          <i class="fas fa-hand-sparkles fa-3x mb-3" style="color: var(--celeste-agua);"></i> 
                          <h4 class="fw-bold">Limpieza y Mantenimiento</h4> 
                          <p class="text-muted small">Servicio especializado para que tu pileta esté siempre lista.</p> 
-                         <a href="https://wa.me/543586029520" target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a> 
+                         <a href="https://wa.me/543586029520?text=Hola!%20Me%20gustaría%20pedir%20un%20presupuesto%20para%20limpieza%20y%20mantenimiento%20de%20mi%20piscina." target="_blank" class="btn btn-outline-azul mt-auto">PEDIR PRESUPUESTO</a> 
                      </div> 
                  </div> 
              </div> 
@@ -179,7 +179,9 @@
              {% for p in limpieza %} 
              <div class="col-6 col-md-3 mb-4"> 
                  <div class="card h-100 product-card shadow-sm border text-center"> 
-                     {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %} 
+                     <a href="{% url 'detalle_producto' p.pk %}">
+                        {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %} 
+                     </a>
                      <div class="card-body d-flex flex-column p-2 p-md-3"> 
                          <span class="category-badge mb-1">{{ p.categoria.nombre }}</span> 
                          <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6> 
@@ -204,7 +206,9 @@
              {% for p in piletas %} 
              <div class="col-6 col-md-3 mb-4"> 
                  <div class="card h-100 product-card shadow-sm border text-center"> 
-                     {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %} 
+                     <a href="{% url 'detalle_producto' p.pk %}">
+                        {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %} 
+                     </a>
                      <div class="card-body d-flex flex-column p-2 p-md-3"> 
                          <span class="category-badge mb-1">{{ p.categoria.nombre }}</span> 
                          <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6> 
@@ -229,7 +233,9 @@
              {% for p in inflables %} 
              <div class="col-6 col-md-3 mb-4"> 
                  <div class="card h-100 product-card shadow-sm border text-center"> 
-                     {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %} 
+                     <a href="{% url 'detalle_producto' p.pk %}">
+                        {% if p.imagen %}<img src="{{ p.imagen.url }}" class="card-img-top">{% else %}<img src="https://via.placeholder.com/300" class="card-img-top">{% endif %} 
+                     </a>
                      <div class="card-body d-flex flex-column p-2 p-md-3"> 
                          <span class="category-badge mb-1">{{ p.categoria.nombre }}</span> 
                          <h6 class="card-title fw-bold text-dark small">{{ p.nombre|upper }}</h6> 
@@ -309,7 +315,7 @@
                              <div class="d-flex justify-content-between"><span>Refuerzo Shock:</span><span class="fw-bold text-danger"><span id="shock">0</span> g.</span></div> 
                          </div> 
                          <div class="text-center mt-3"> 
-                             <a href="https://wa.me/543585615079" id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a> 
+                             <a href="https://wa.me/543585615079?text=Hola!%20Quisiera%20encargar%20los%20productos%20para%20el%20mantenimiento%20de%20mi%20piscina." id="wacalc" target="_blank" class="btn btn-vulcano">ENCARGAR PRODUCTOS</a> 
                          </div> 
                      </div> 
                  </div> 
@@ -331,7 +337,6 @@
          document.addEventListener('click', function(e) { 
              const btn = e.target.closest('.mantener-scroll');
              if (btn) { 
-                 // Guardamos la posición en sessionStorage para que persista al recargar
                  sessionStorage.setItem('scrollPos', window.scrollY);
              } 
          }); 
@@ -344,7 +349,6 @@
                  sessionStorage.removeItem('scrollPos');
              }
 
-             // Lógica para abrir el modal si viene con el parámetro show_carrito
              const urlParams = new URLSearchParams(window.location.search);
              if (urlParams.get('show_carrito') === '1') { 
                  var myModal = new bootstrap.Modal(document.getElementById('modalCarrito')); 
@@ -360,13 +364,15 @@
                  let vol = Math.round(largo * ancho * prof * 1000); 
                  document.getElementById('litros').innerText = vol.toLocaleString(); 
                  
-                 // Pastillas (1 cada 20.000 litros)
                  let p = Math.ceil(vol / 20000);
                  document.getElementById('pastillas').innerText = p;
                  
-                 // Shock (100g cada 10.000 litros)
                  let s = Math.round((vol / 10000) * 100);
                  document.getElementById('shock').innerText = s;
+
+                 // Actualizar el link de whatsapp dinámicamente con los datos calculados
+                 let mensaje = `Hola! Quisiera encargar los productos para mi piscina de ${vol.toLocaleString()} litros. Según la calculadora necesito ${p} pastillas y ${s}g de shock.`;
+                 document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(mensaje)}`;
              } 
          } 
      </script> 
