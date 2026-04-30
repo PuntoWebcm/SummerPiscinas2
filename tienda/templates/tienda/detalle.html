@@ -13,17 +13,13 @@
             --azul-vulcano: #003366;
             --celeste-agua: #00a8e8;
         }
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; scroll-behavior: auto !important; }
         .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
-        .navbar-brand { color: var(--azul-vulcano) !important; letter-spacing: 1px; }
-        
         .product-container { background: white; border-radius: 0; margin-top: 50px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .img-producto { max-height: 450px; object-fit: contain; width: 100%; transition: 0.3s; }
-        .img-producto:hover { transform: scale(1.02); }
-        
+        .img-producto { max-height: 450px; object-fit: contain; width: 100%; }
         .price-tag { color: var(--azul-vulcano); font-size: 2.5rem; font-weight: 700; }
         
-        .btn-vulcano { background-color: var(--azul-vulcano); color: white; border-radius: 0; font-weight: bold; padding: 15px; transition: 0.3s; border: none; }
+        .btn-vulcano { background-color: var(--azul-vulcano); color: white; border-radius: 0; font-weight: bold; padding: 15px; transition: 0.3s; text-decoration: none; display: block; text-align: center; }
         .btn-vulcano:hover { background-color: var(--celeste-agua); color: white; }
         
         .btn-outline-azul { border: 2px solid var(--azul-vulcano); color: var(--azul-vulcano); font-weight: bold; border-radius: 0; padding: 15px; transition: 0.3s; text-decoration: none; display: block; text-align: center; }
@@ -31,21 +27,19 @@
 
         .btn-whatsapp { background-color: #25d366; color: white; font-weight: bold; border-radius: 0; padding: 15px; text-decoration: none; display: block; text-align: center; }
         .btn-whatsapp:hover { background-color: #1ebe57; color: white; }
-        
-        .breadcrumb-item a { color: var(--celeste-agua); }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+    <nav class="navbar navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
+            <a class="navbar-brand fw-bold" href="/" style="color: var(--azul-vulcano);">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
         </div>
     </nav>
 
     <div class="container mb-5">
         <div class="row product-container">
-            <div class="col-md-6 border-end text-center p-4 d-flex align-items-center justify-content-center">
+            <div class="col-md-6 border-end text-center p-4">
                 {% if producto.imagen %}
                     <img src="{{ producto.imagen.url }}" class="img-producto" alt="{{ producto.nombre }}">
                 {% else %}
@@ -54,48 +48,65 @@
             </div>
 
             <div class="col-md-6 p-4">
-                <nav aria-label="breadcrumb" class="mb-3">
+                <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Inicio</a></li>
-                        <li class="breadcrumb-item active text-muted" aria-current="page">{{ producto.categoria.nombre }}</li>
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Inicio</a></li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ producto.categoria.nombre }}</li>
                     </ol>
                 </nav>
                 
-                <h1 class="display-6 fw-bold mb-3" style="color: var(--azul-vulcano);">{{ producto.nombre|upper }}</h1>
+                <h1 class="display-5 fw-bold mb-3" style="color: var(--azul-vulcano);">{{ producto.nombre|upper }}</h1>
                 
                 <p class="price-tag mb-4">$ {{ producto.precio|intcomma }}</p>
                 
                 <div class="mb-4">
-                    <h5 class="fw-bold text-dark">Descripción del producto:</h5>
-                    <p class="text-muted lead" style="font-size: 1.1rem;">{{ producto.descripcion }}</p>
+                    <h5 class="fw-bold">Descripción:</h5>
+                    <p class="text-muted lead">{{ producto.descripcion }}</p>
                 </div>
 
                 <div class="d-grid gap-3">
                     <a href="{% url 'checkout' producto.id %}" class="btn btn-vulcano btn-lg shadow-sm">
-                        <i class="fas fa-credit-card me-2"></i> COMPRAR AHORA
+                        <i class="fas fa-shopping-cart me-2"></i> COMPRAR AHORA
                     </a>
 
-                    <a href="{% url 'agregar' producto.id %}?show_carrito=1" class="btn btn-outline-azul btn-lg shadow-sm">
+                    <a href="{% url 'agregar' producto.id %}?show_carrito=1" class="btn btn-outline-azul btn-lg shadow-sm mantener-scroll">
                         <i class="fas fa-cart-plus me-2"></i> AGREGAR AL CARRITO
                     </a>
 
-                    <a href="https://wa.me/543585615079?text=Hola!%20Me%20interesa%20obtener%20más%20información%20sobre%20el%20producto:%20{{ producto.nombre|urlencode }}%20(Precio:%20$%20{{ producto.precio|intcomma }})" 
+                    <a href="https://wa.me/543585615079?text=Hola,%20me%20interesa%20el%20producto:%20{{ producto.nombre }}" 
                        target="_blank" class="btn btn-whatsapp btn-lg shadow-sm">
                         <i class="fab fa-whatsapp me-2"></i> CONSULTAR POR WHATSAPP
                     </a>
                     
-                    <div class="text-center mt-3">
-                        <a href="/" class="text-decoration-none text-muted small"><i class="fas fa-chevron-left me-1"></i> Volver al catálogo</a>
-                    </div>
+                    <a href="/" class="btn btn-link text-muted mt-2 text-decoration-none">← Volver al catálogo</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="text-center py-4 text-muted bg-white border-top">
+    <footer class="text-center py-4 text-muted">
         <small>© 2026 Summer Piscinas - Especialistas en Agua</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // CAPTURA POSICIÓN ANTES DE RECARGAR
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.mantener-scroll');
+            if (btn) {
+                sessionStorage.setItem('scrollPosDetail', window.scrollY);
+            }
+        });
+
+        // RESTAURA POSICIÓN AL CARGAR
+        window.addEventListener('load', function() {
+            const scrollPos = sessionStorage.getItem('scrollPosDetail');
+            if (scrollPos) {
+                window.scrollTo({ top: parseInt(scrollPos), behavior: 'instant' });
+                sessionStorage.removeItem('scrollPosDetail');
+            }
+        });
+    </script>
 </body>
 </html>

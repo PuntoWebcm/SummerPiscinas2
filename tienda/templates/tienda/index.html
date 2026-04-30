@@ -287,7 +287,7 @@
                      {% else %}<div class="text-center py-4"><p class="text-muted">El carrito está vacío.</p></div>{% endif %} 
                  </div> 
                  <div class="modal-footer"> 
-                     <a href="{% url 'limpiar' %}" class="btn btn-sm btn-link text-danger">Vaciar Carrito</a> 
+                     <a href="{% url 'limpiar' %}" class="btn btn-sm btn-link text-danger mantener-scroll">Vaciar Carrito</a> 
                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Seguir Comprando</button> 
                      {% if request.session.carrito %}<a href="{% url 'checkout_carrito' %}" class="btn btn-vulcano">FINALIZAR COMPRA</a>{% endif %} 
                  </div> 
@@ -323,8 +323,35 @@
          </div> 
      </section> 
 
+     <section id="nosotros" class="py-5 bg-light border-top">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0" data-aos="fade-right">
+                    <h2 class="section-title mb-4">Sobre Nosotros</h2>
+                    <p class="lead text-dark fw-bold">Expertos en el cuidado y disfrute de tu piscina.</p>
+                    <p class="text-muted">En <strong>Summer Piscinas</strong> nos dedicamos a brindar soluciones integrales para que solo tengas que preocuparte por disfrutar del agua. Contamos con años de experiencia en mantenimiento técnico, venta de insumos químicos de alta calidad y la mejor línea de inflables y accesorios de la región.</p>
+                    <p class="text-muted">Nuestro compromiso es la transparencia, la calidad y la atención personalizada en cada consulta.</p>
+                </div>
+                <div class="col-md-6 text-center" data-aos="fade-left">
+                    <div class="p-4 bg-white shadow-sm border">
+                        <i class="fas fa-medal fa-3x mb-3" style="color: var(--celeste-agua);"></i>
+                        <h5 class="fw-bold">Calidad Certificada</h5>
+                        <p class="small text-muted mb-0">Trabajamos con las marcas líderes del mercado para garantizar resultados duraderos en tu pileta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </section>
+
      <footer id="contacto" class="bg-dark text-white pt-5 pb-3"> 
-         <div class="container text-center"><p class="small text-muted">© 2026 Summer Piscinas</p></div> 
+         <div class="container text-center">
+            <div class="mb-3">
+                <a href="#" class="text-white me-3 text-decoration-none"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="text-white me-3 text-decoration-none"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/543585615079" class="text-white text-decoration-none"><i class="fab fa-whatsapp"></i></a>
+            </div>
+            <p class="small text-muted">© 2026 Summer Piscinas - Río Cuarto, Córdoba</p>
+         </div> 
      </footer> 
 
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
@@ -351,7 +378,8 @@
 
              const urlParams = new URLSearchParams(window.location.search);
              if (urlParams.get('show_carrito') === '1') { 
-                 var myModal = new bootstrap.Modal(document.getElementById('modalCarrito')); 
+                 var modalEl = document.getElementById('modalCarrito');
+                 var myModal = new bootstrap.Modal(modalEl); 
                  myModal.show(); 
              } 
          }); 
@@ -370,7 +398,6 @@
                  let s = Math.round((vol / 10000) * 100);
                  document.getElementById('shock').innerText = s;
 
-                 // Actualizar el link de whatsapp dinámicamente con los datos calculados
                  let mensaje = `Hola! Quisiera encargar los productos para mi piscina de ${vol.toLocaleString()} litros. Según la calculadora necesito ${p} pastillas y ${s}g de shock.`;
                  document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(mensaje)}`;
              } 
