@@ -378,20 +378,31 @@
      <script> 
          AOS.init({ duration: 1000, once: true }); 
 
-         // CAPTURA POSICIÓN ANTES DE RECARGAR (Usando localStorage para mayor persistencia en móviles)
+         // CAPTURA POSICIÓN ANTES DE RECARGAR
          document.addEventListener('click', function(e) { 
              const btn = e.target.closest('.mantener-scroll');
              if (btn) { 
                  localStorage.setItem('scrollPos', window.scrollY);
+                 localStorage.setItem('ejecutarScroll', 'true');
              } 
          }); 
 
-         // RESTAURA POSICIÓN AL CARGAR
+         // RESTAURA POSICIÓN (Relámpago)
+         (function() {
+             const scrollPos = localStorage.getItem('scrollPos');
+             const debeScroll = localStorage.getItem('ejecutarScroll');
+             if (debeScroll === 'true' && scrollPos) {
+                 window.scrollTo(0, parseInt(scrollPos));
+             }
+         })();
+
+         // RESTAURA AL CARGAR Y ABRE MODAL
          window.addEventListener('load', function() { 
              const scrollPos = localStorage.getItem('scrollPos');
              if (scrollPos) { 
                  window.scrollTo(0, parseInt(scrollPos)); 
                  localStorage.removeItem('scrollPos');
+                 localStorage.removeItem('ejecutarScroll');
              }
 
              const urlParams = new URLSearchParams(window.location.search);
