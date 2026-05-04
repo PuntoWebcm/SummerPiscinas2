@@ -5,7 +5,7 @@ from .models import Producto, Pedido, DetallePedido, Categoria
 from .carrito import Carrito
 from django.db.models import Q
 
-# --- HOME CON BUSCADOR ARREGLADO ---
+# --- HOME CON BUSCADOR ---
 def home(request):
     query = request.GET.get('buscar')
     
@@ -46,7 +46,7 @@ def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     return render(request, 'tienda/detalle.html', {'producto': producto})
 
-# --- GESTIÓN DEL CARRITO (CON AJAX Y REDIRECTS) ---
+# --- GESTIÓN DEL CARRITO ---
 
 def agregar_producto(request, producto_id):
     carrito = Carrito(request)
@@ -80,12 +80,21 @@ def limpiar_carrito(request):
     carrito.limpiar()
     return redirect('home')
 
-# --- CHECKOUT, MERCADO PAGO Y ENVÍOS ---
+# --- CHECKOUT Y RETORNO DE PAGO ---
 
 def pago_exitoso(request):
+    """
+    Esta vista recibe al cliente después de pagar en Mercado Pago.
+    """
     carrito = Carrito(request)
-    carrito.limpiar() 
-    pedido = Pedido.objects.all().order_by('-id').first()
+    carrito.limpiar() # Limpiamos el carrito al confirmar éxito
+    
+    # Intentamos traer el pedido más reciente de forma segura
+    try:
+        pedido = Pedido.objects.latest('id')
+    except Pedido.DoesNotExist:
+        pedido = None
+        
     return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido})
 
 def checkout_carrito(request):
@@ -98,11 +107,10 @@ def checkout_carrito(request):
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         whatsapp = request.POST.get('whatsapp')
-        localidad = request.POST.get('localidad') # Nuevo
-        direccion = request.POST.get('direccion') # Nuevo
+        localidad = request.POST.get('localidad')
+        direccion = request.POST.get('direccion')
         metodo = request.POST.get('metodo_pago')
 
-        # Guardamos el pedido con los nuevos datos de envío
         pedido = Pedido.objects.create(
             nombre_completo=nombre, 
             email=email, 
@@ -140,12 +148,11 @@ def checkout_carrito(request):
                 if preference and "id" in preference:
                     pedido.mp_preference_id = preference["id"]
                     pedido.save()
-                    carrito_instancia.limpiar()
                     return redirect(preference["init_point"])
             except Exception as e:
                 return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito, 'error': str(e)})
         else:
-            carrito_instancia.limpiar()
+            # Transferencia
             return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido, 'transferencia': True})
             
     return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito})
@@ -156,8 +163,8 @@ def procesar_compra(request, producto_id):
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         whatsapp = request.POST.get('whatsapp')
-        localidad = request.POST.get('localidad') # Nuevo
-        direccion = request.POST.get('direccion') # Nuevo
+        localidad = request.POST.get('localidad')
+        direccion = request.POST.get('direccion')
         metodo = request.POST.get('metodo_pago')
         
         pedido = Pedido.objects.create(
