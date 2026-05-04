@@ -41,6 +41,11 @@ class Pedido(models.Model):
     nombre_completo = models.CharField(max_length=200, verbose_name="Nombre del Cliente")
     email = models.EmailField(verbose_name="Correo Electrónico")
     whatsapp = models.CharField(max_length=20, verbose_name="WhatsApp")
+    
+    # --- NUEVOS CAMPOS CORREGIDOS (Sin el error de 'border') ---
+    localidad = models.CharField(max_length=100, default="No especificada", verbose_name="Localidad")
+    direccion = models.CharField(max_length=250, default="No especificada", verbose_name="Dirección")
+    
     total = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Total")
     metodo_pago = models.CharField(max_length=2, choices=METODOS_PAGO, verbose_name="Medio de Pago")
     estado_pago = models.CharField(max_length=2, choices=ESTADOS_PAGO, default='PE', verbose_name="Estado")
@@ -63,9 +68,3 @@ class DetallePedido(models.Model):
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre if self.producto else 'Producto eliminado'}"
-    
-class Pedido(models.Model):
-    # ... tus campos actuales (nombre, email, whatsapp, etc.) ...
-    localidad = models.CharField(max_length=100, border=True, default="No especificada")
-    direccion = models.CharField(max_length=250, border=True, default="No especificada")
-    # ...
