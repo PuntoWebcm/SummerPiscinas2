@@ -364,47 +364,48 @@
     <script> 
         AOS.init({ duration: 1000, once: true }); 
 
-        // Lógica AJAX para agregar al carrito sin que la página salte
+        // Bloque de ejecución inmediata para restaurar scroll antes de cualquier renderizado
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const posParam = params.get('pos');
+            if (posParam) {
+                window.scrollTo(0, parseInt(posParam));
+            } else {
+                const storagePos = localStorage.getItem('scrollPos');
+                if (storagePos) {
+                    window.scrollTo(0, parseInt(storagePos));
+                    localStorage.removeItem('scrollPos');
+                }
+            }
+        })();
+
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('.btn-agregar-ajax');
             const linkScroll = e.target.closest('.mantener-scroll');
 
-            // Caso 1: Botones de AGREGAR (Ajax)
             if (btn) {
                 e.preventDefault();
                 const url = btn.getAttribute('data-url');
-                const currentPos = window.scrollY; // Guardamos posición actual
+                const currentPos = window.scrollY; 
 
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(() => {
-                    // Recargamos con la posición en la URL para evitar el salto
-                    window.location.href = window.location.pathname + "?show_carrito=1&pos=" + currentPos;
+                    // Agregamos la posición exacta a la URL para que el script de arriba la tome al instante
+                    window.location.href = window.location.pathname + "?show_carrito=1&pos=" + Math.round(currentPos);
                 });
             }
 
-            // Caso 2: Enlaces normales de restar/eliminar (mantener scroll tradicional)
             if (linkScroll) {
                 localStorage.setItem('scrollPos', window.scrollY);
             }
         });
 
-        // Bloque de ejecución inmediata para posicionar el scroll antes de renderizar
-        (function() {
-            const params = new URLSearchParams(window.location.search);
-            const posParam = params.get('pos');
-            const storagePos = localStorage.getItem('scrollPos');
-
-            if (posParam) {
-                window.scrollTo(0, parseInt(posParam));
-            } else if (storagePos) {
-                window.scrollTo(0, parseInt(storagePos));
-                localStorage.removeItem('scrollPos');
-            }
-        })();
-
-        // Abrir el modal del carrito automáticamente si viene el parámetro
         window.addEventListener('load', function() { 
             const urlParams = new URLSearchParams(window.location.search);
+            // Re-chequeo de scroll por si las imágenes movieron el layout
+            const posParam = urlParams.get('pos');
+            if (posParam) window.scrollTo(0, parseInt(posParam));
+
             if (urlParams.get('show_carrito') === '1') { 
                 var modalEl = document.getElementById('modalCarrito');
                 if (modalEl) {
