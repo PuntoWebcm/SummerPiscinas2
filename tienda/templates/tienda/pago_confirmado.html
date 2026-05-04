@@ -1,30 +1,57 @@
-{% extends 'tienda/base.html' %} {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Compra Exitosa! | Summer Piscinas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <style>
+        :root { --azul-vulcano: #003366; --celeste-agua: #00a8e8; }
+        body { background-color: #f4f7f6; font-family: 'Roboto', sans-serif; }
+        .card { border-radius: 20px; border: none; }
+        .btn-whatsapp { background-color: #25D366; color: white; font-weight: bold; border-radius: 10px; transition: 0.3s; }
+        .btn-whatsapp:hover { background-color: #128C7E; color: white; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+    <div class="container text-center py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow-lg p-4 mt-5">
+                    
+                    {% if transferencia %}
+                        <i class="fas fa-university fa-4x mb-3" style="color: var(--azul-vulcano);"></i>
+                        <h2 class="fw-bold" style="color: var(--azul-vulcano);">¡Pedido Registrado!</h2>
+                        <p class="text-muted">Por favor, realizá la transferencia y enviá el comprobante por WhatsApp para despachar tu producto.</p>
+                    {% else %}
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h2 class="fw-bold text-success">¡Pago Confirmado!</h2>
+                        <p class="text-muted">¡Gracias por confiar en Summer Piscinas! Ya recibimos tu pago.</p>
+                    {% endif %}
+                    
+                    <div class="bg-light p-4 rounded mb-4 text-start">
+                        <h5 class="fw-bold border-bottom pb-2">Resumen del Pedido #{{ pedido.id }}</h5>
+                        <p class="mb-1"><strong>Cliente:</strong> {{ pedido.nombre_completo }}</p>
+                        <p class="mb-1"><strong>Total:</strong> ${{ pedido.total }}</p>
+                        <p class="mb-1"><strong>Localidad:</strong> {{ pedido.localidad }}</p>
+                        <p class="mb-0"><strong>Dirección:</strong> {{ pedido.direccion }}</p>
+                    </div>
 
-{% block content %}
-<div class="container text-center py-5" style="margin-top: 100px; margin-bottom: 100px;">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-lg p-4" style="border-radius: 20px;">
-                <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
-                <h2 class="fw-bold">¡Pago Confirmado!</h2>
-                <p class="text-muted">Gracias por confiar en Summer Piscinas. Tu pedido ya está en nuestro sistema.</p>
-                
-                <div class="bg-light p-3 rounded mb-4">
-                    <p class="mb-1"><strong>Pedido:</strong> #{{ pedido.id }}</p>
-                    <p class="mb-0"><strong>Cliente:</strong> {{ pedido.nombre_completo }}</p>
+                    <p class="fw-bold mb-3 small text-uppercase">Coordiná el envío ahora:</p>
+                    
+                    <a href="https://wa.me/543585615079?text=Hola Summer Piscinas! 👋%0AMi nombre es *{{ pedido.nombre_completo }}*.%0AAcabo de realizar el pedido *%23{{ pedido.id }}* por un total de *${{ pedido.total }}*.%0A%0A📍 *Datos de envío:*%0A- Localidad: {{ pedido.localidad }}%0A- Dirección: {{ pedido.direccion }}%0A%0AAdjunto el comprobante. ¿Cómo seguimos?" 
+                       target="_blank" 
+                       class="btn btn-whatsapp btn-lg w-100 py-3 shadow-sm text-decoration-none">
+                        <i class="fab fa-whatsapp me-2"></i> ENVIAR DATOS POR WHATSAPP
+                    </a>
+                    
+                    <div class="mt-4">
+                        <a href="/" class="text-decoration-none text-muted small">← Volver al inicio</a>
+                    </div>
                 </div>
-
-                <p class="fw-bold">Para coordinar el envío o retiro, avisale a la dueña por WhatsApp:</p>
-                
-                <a href="https://wa.me/543585615079?text=Hola! Soy {{ pedido.nombre_completo }}. Acabo de realizar el pedido %23{{ pedido.id }} por la web y ya está pagado. ¿Cómo coordinamos el envío?" 
-                   target="_blank" 
-                   class="btn btn-success btn-lg w-100 py-3 shadow">
-                    <i class="fab fa-whatsapp me-2"></i> COORDINAR POR WHATSAPP
-                </a>
-                
-                <a href="/" class="btn btn-link mt-3 text-decoration-none text-muted">Volver a la tienda</a>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>
