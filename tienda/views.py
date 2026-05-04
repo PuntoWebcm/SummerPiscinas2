@@ -5,11 +5,22 @@ from .models import Producto, Pedido, DetallePedido, Categoria
 from .carrito import Carrito
 from django.db.models import Q
 
+# --- HOME CON BUSCADOR ARREGLADO ---
 def home(request):
-    # Filtros para las secciones de la Home
-    limpieza = Producto.objects.filter(categoria__nombre__icontains="Limpieza")[:4]
-    piletas = Producto.objects.filter(categoria__nombre__icontains="Piscin")[:4]
-    inflables_list = Producto.objects.filter(categoria__nombre__icontains="Inflables")[:4]
+    query = request.GET.get('buscar')
+    
+    limpieza_qs = Producto.objects.filter(categoria__nombre__icontains="Limpieza")
+    piletas_qs = Producto.objects.filter(categoria__nombre__icontains="Piscin")
+    inflables_qs = Producto.objects.filter(categoria__nombre__icontains="Inflables")
+
+    if query:
+        limpieza = limpieza_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
+        piletas = piletas_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
+        inflables_list = inflables_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
+    else:
+        limpieza = limpieza_qs[:4]
+        piletas = piletas_qs[:4]
+        inflables_list = inflables_qs[:4]
 
     context = {
         'limpieza': limpieza,
@@ -35,30 +46,28 @@ def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     return render(request, 'tienda/detalle.html', {'producto': producto})
 
-# --- GESTIÓN DEL CARRITO (CON PERSISTENCIA DE POSICIÓN) ---
+# --- GESTIÓN DEL CARRITO (CON AJAX Y REDIRECTS) ---
 
 def agregar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
     
+    # Si es una petición AJAX (desde nuestro nuevo script), devolvemos el index para que el JS actualice el modal
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'tienda/index.html')
+        
     referer = request.META.get('HTTP_REFERER', '/')
-    base_url = referer.split('?')[0]
-    scroll = request.GET.get('scroll', '0')
-    
-    url_destino = f"{base_url}?scroll={scroll}"
-    if request.GET.get('show_carrito') == '1':
-        url_destino += "&show_carrito=1"
-    return redirect(url_destino)
+    return redirect(referer)
 
 def eliminar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.eliminar(producto)
     referer = request.META.get('HTTP_REFERER', '/')
+    # Mantenemos el parámetro para que se abra el modal al recargar
     base_url = referer.split('?')[0]
-    scroll = request.GET.get('scroll', '0')
-    return redirect(f"{base_url}?scroll={scroll}&show_carrito=1")
+    return redirect(f"{base_url}?show_carrito=1")
 
 def restar_producto(request, producto_id):
     carrito = Carrito(request)
@@ -66,15 +75,19 @@ def restar_producto(request, producto_id):
     carrito.restar(producto)
     referer = request.META.get('HTTP_REFERER', '/')
     base_url = referer.split('?')[0]
-    scroll = request.GET.get('scroll', '0')
-    return redirect(f"{base_url}?scroll={scroll}&show_carrito=1")
+    return redirect(f"{base_url}?show_carrito=1")
 
 def limpiar_carrito(request):
     carrito = Carrito(request)
     carrito.limpiar()
     return redirect('home')
 
-# --- CHECKOUT Y MERCADO PAGO ---
+# --- CHECKOUT, MERCADO PAGO Y WHATSAPP ---
+
+def pago_exitoso(request):
+    # Traemos el último pedido para mostrar en la pantalla de éxito
+    pedido = Pedido.objects.all().order_by('-id').first()
+    return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido})
 
 def checkout_carrito(request):
     carrito_instancia = Carrito(request)
@@ -99,33 +112,64 @@ def checkout_carrito(request):
         if metodo == 'MP':
             try:
                 sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-                preference_data = {"items": items_mp, "back_urls": {"success": request.build_absolute_uri('/'), "failure": request.build_absolute_uri('/'), "pending": request.build_absolute_uri('/')}, "auto_return": "approved", "binary_mode": True, "statement_descriptor": "SUMMER PISCINAS"}
+                success_url = request.build_absolute_uri('/pago-exitoso/')
+                preference_data = {
+                    "items": items_mp, 
+                    "back_urls": {
+                        "success": success_url, 
+                        "failure": request.build_absolute_uri('/'), 
+                        "pending": success_url
+                    }, 
+                    "auto_return": "approved", 
+                    "binary_mode": True, 
+                    "statement_descriptor": "SUMMER PISCINAS"
+                }
                 preference_response = sdk.preference().create(preference_data)
                 preference = preference_response.get("response")
                 if preference and "id" in preference:
-                    pedido.mp_preference_id = preference["id"]; pedido.save(); carrito_instancia.limpiar()
+                    pedido.mp_preference_id = preference["id"]
+                    pedido.save()
+                    carrito_instancia.limpiar()
                     return redirect(preference["init_point"])
             except Exception as e:
                 return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito, 'error': str(e)})
         else:
+            # Para transferencia, mandamos al éxito directamente aclarando el método
             carrito_instancia.limpiar()
-            return render(request, 'tienda/gracias_transferencia.html', {'pedido': pedido})
+            return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido, 'transferencia': True})
+            
     return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito})
 
 def procesar_compra(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     if request.method == 'POST':
-        nombre = request.POST.get('nombre'); email = request.POST.get('email'); whatsapp = request.POST.get('whatsapp'); metodo = request.POST.get('metodo_pago')
+        nombre = request.POST.get('nombre')
+        email = request.POST.get('email')
+        whatsapp = request.POST.get('whatsapp')
+        metodo = request.POST.get('metodo_pago')
+        
         pedido = Pedido.objects.create(nombre_completo=nombre, email=email, whatsapp=whatsapp, total=producto.precio, metodo_pago=metodo, estado_pago='PE')
         DetallePedido.objects.create(pedido=pedido, producto=producto, cantidad=1, precio_unitario=producto.precio)
+        
         if metodo == 'MP':
             try:
                 sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-                preference_data = {"items": [{"title": str(producto.nombre), "quantity": 1, "unit_price": float(producto.precio), "currency_id": "ARS"}], "back_urls": {"success": request.build_absolute_uri('/')}, "auto_return": "approved", "binary_mode": True}
-                preference_response = sdk.preference().create(preference_data); preference = preference_response.get("response")
+                success_url = request.build_absolute_uri('/pago-exitoso/')
+                preference_data = {
+                    "items": [{"title": str(producto.nombre), "quantity": 1, "unit_price": float(producto.precio), "currency_id": "ARS"}], 
+                    "back_urls": {"success": success_url}, 
+                    "auto_return": "approved", 
+                    "binary_mode": True
+                }
+                preference_response = sdk.preference().create(preference_data)
+                preference = preference_response.get("response")
                 if preference and "id" in preference:
-                    pedido.mp_preference_id = preference["id"]; pedido.save()
+                    pedido.mp_preference_id = preference["id"]
+                    pedido.save()
                     return redirect(preference["init_point"])
-            except Exception: return render(request, 'tienda/checkout.html', {'producto': producto, 'error': 'Error MP'})
-        else: return render(request, 'tienda/gracias_transferencia.html', {'pedido': pedido})
+            except Exception: 
+                return render(request, 'tienda/checkout.html', {'producto': producto, 'error': 'Error MP'})
+        else: 
+            return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido, 'transferencia': True})
+            
     return render(request, 'tienda/checkout.html', {'producto': producto})
