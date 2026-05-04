@@ -63,3 +63,9 @@ class DetallePedido(models.Model):
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre if self.producto else 'Producto eliminado'}"
+    
+class Pedido(models.Model):
+    # ... tus campos actuales (nombre, email, whatsapp, etc.) ...
+    localidad = models.CharField(max_length=100, border=True, default="No especificada")
+    direccion = models.CharField(max_length=250, border=True, default="No especificada")
+    # ...

@@ -20,8 +20,11 @@ urlpatterns = [
     # --- RUTA PARA PAGAR TODO EL CARRITO ---
     path('checkout-carrito/', views.checkout_carrito, name='checkout_carrito'),
     
-    # --- RETORNO DE MERCADO PAGO ---
-    path('pago-confirmado/', views.home, name='pago_exitoso'),
+    # --- RETORNO DE MERCADO PAGO Y ÉXITO ---
+    # Esta es la ruta que Mercado Pago busca cuando el pago es exitoso
+    path('pago-exitoso/', views.pago_exitoso, name='pago_exitoso'),
+    
+    # Estas pueden volver al home o a una página de error si lo prefieres
     path('pago-fallido/', views.home, name='pago_fallido'),
     path('pago-pendiente/', views.home, name='pago_pendiente'),
 ]

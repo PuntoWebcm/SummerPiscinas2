@@ -53,7 +53,6 @@ def agregar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
     
-    # Si es una petición AJAX (desde nuestro nuevo script), devolvemos el index para que el JS actualice el modal
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return render(request, 'tienda/index.html')
         
@@ -65,7 +64,6 @@ def eliminar_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.eliminar(producto)
     referer = request.META.get('HTTP_REFERER', '/')
-    # Mantenemos el parámetro para que se abra el modal al recargar
     base_url = referer.split('?')[0]
     return redirect(f"{base_url}?show_carrito=1")
 
@@ -82,10 +80,11 @@ def limpiar_carrito(request):
     carrito.limpiar()
     return redirect('home')
 
-# --- CHECKOUT, MERCADO PAGO Y WHATSAPP ---
+# --- CHECKOUT, MERCADO PAGO Y ENVÍOS ---
 
 def pago_exitoso(request):
-    # Traemos el último pedido para mostrar en la pantalla de éxito
+    carrito = Carrito(request)
+    carrito.limpiar() 
     pedido = Pedido.objects.all().order_by('-id').first()
     return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido})
 
@@ -99,9 +98,21 @@ def checkout_carrito(request):
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         whatsapp = request.POST.get('whatsapp')
+        localidad = request.POST.get('localidad') # Nuevo
+        direccion = request.POST.get('direccion') # Nuevo
         metodo = request.POST.get('metodo_pago')
 
-        pedido = Pedido.objects.create(nombre_completo=nombre, email=email, whatsapp=whatsapp, total=total_carrito, metodo_pago=metodo, estado_pago='PE')
+        # Guardamos el pedido con los nuevos datos de envío
+        pedido = Pedido.objects.create(
+            nombre_completo=nombre, 
+            email=email, 
+            whatsapp=whatsapp, 
+            localidad=localidad, 
+            direccion=direccion, 
+            total=total_carrito, 
+            metodo_pago=metodo, 
+            estado_pago='PE'
+        )
         
         items_mp = []
         for item in carrito_session.values():
@@ -134,7 +145,6 @@ def checkout_carrito(request):
             except Exception as e:
                 return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito, 'error': str(e)})
         else:
-            # Para transferencia, mandamos al éxito directamente aclarando el método
             carrito_instancia.limpiar()
             return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido, 'transferencia': True})
             
@@ -146,9 +156,20 @@ def procesar_compra(request, producto_id):
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         whatsapp = request.POST.get('whatsapp')
+        localidad = request.POST.get('localidad') # Nuevo
+        direccion = request.POST.get('direccion') # Nuevo
         metodo = request.POST.get('metodo_pago')
         
-        pedido = Pedido.objects.create(nombre_completo=nombre, email=email, whatsapp=whatsapp, total=producto.precio, metodo_pago=metodo, estado_pago='PE')
+        pedido = Pedido.objects.create(
+            nombre_completo=nombre, 
+            email=email, 
+            whatsapp=whatsapp, 
+            localidad=localidad, 
+            direccion=direccion, 
+            total=producto.precio, 
+            metodo_pago=metodo, 
+            estado_pago='PE'
+        )
         DetallePedido.objects.create(pedido=pedido, producto=producto, cantidad=1, precio_unitario=producto.precio)
         
         if metodo == 'MP':
