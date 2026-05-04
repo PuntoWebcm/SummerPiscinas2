@@ -361,75 +361,73 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script> 
      
-    <script> 
-        AOS.init({ duration: 1000, once: true }); 
+    <script>
+    AOS.init({ duration: 1000, once: true });
 
-        // Bloque de ejecución inmediata para restaurar scroll antes de cualquier renderizado
-        (function() {
-            const params = new URLSearchParams(window.location.search);
-            const posParam = params.get('pos');
-            if (posParam) {
-                window.scrollTo(0, parseInt(posParam));
-            } else {
-                const storagePos = localStorage.getItem('scrollPos');
-                if (storagePos) {
-                    window.scrollTo(0, parseInt(storagePos));
-                    localStorage.removeItem('scrollPos');
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-agregar-ajax');
+        
+        if (btn) {
+            e.preventDefault(); // EVITA QUE LA PÁGINA SE RECARGUE
+            const url = btn.getAttribute('data-url');
+
+            // Hacemos la petición en segundo plano
+            fetch(url, {
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(response => response.text())
+            .then(html => {
+                // 1. Parseamos la respuesta para extraer el nuevo modal y el badge
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // 2. Actualizamos el contenido del modal del carrito
+                const nuevoContenidoModal = doc.querySelector('#modalCarrito .modal-body').innerHTML;
+                const nuevoFooterModal = doc.querySelector('#modalCarrito .modal-footer').innerHTML;
+                document.querySelector('#modalCarrito .modal-body').innerHTML = nuevoContenidoModal;
+                document.querySelector('#modalCarrito .modal-footer').innerHTML = nuevoFooterModal;
+
+                // 3. Actualizamos el numerito (badge) del botón del carrito
+                const nuevoBadge = doc.querySelector('.badge-carrito');
+                const badgeActual = document.querySelector('.badge-carrito');
+                
+                if (nuevoBadge) {
+                    if (badgeActual) {
+                        badgeActual.innerText = nuevoBadge.innerText;
+                    } else {
+                        // Si no había badge, lo creamos
+                        const span = document.createElement('span');
+                        span.className = 'badge-carrito';
+                        span.innerText = nuevoBadge.innerText;
+                        document.querySelector('.btn-carrito').appendChild(span);
+                    }
                 }
-            }
-        })();
 
-        document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn-agregar-ajax');
-            const linkScroll = e.target.closest('.mantener-scroll');
-
-            if (btn) {
-                e.preventDefault();
-                const url = btn.getAttribute('data-url');
-                const currentPos = window.scrollY; 
-
-                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(() => {
-                    // Agregamos la posición exacta a la URL para que el script de arriba la tome al instante
-                    window.location.href = window.location.pathname + "?show_carrito=1&pos=" + Math.round(currentPos);
-                });
-            }
-
-            if (linkScroll) {
-                localStorage.setItem('scrollPos', window.scrollY);
-            }
-        });
-
-        window.addEventListener('load', function() { 
-            const urlParams = new URLSearchParams(window.location.search);
-            // Re-chequeo de scroll por si las imágenes movieron el layout
-            const posParam = urlParams.get('pos');
-            if (posParam) window.scrollTo(0, parseInt(posParam));
-
-            if (urlParams.get('show_carrito') === '1') { 
+                // 4. Abrimos el modal sin recargar
                 var modalEl = document.getElementById('modalCarrito');
-                if (modalEl) {
-                    var myModal = new bootstrap.Modal(modalEl); 
-                    myModal.show(); 
-                }
-            } 
-        }); 
+                var myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                myModal.show();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    });
 
-        function calcular() { 
-            let largo = document.getElementById('largo').value; 
-            let ancho = document.getElementById('ancho').value; 
-            let prof = document.getElementById('prof').value; 
-            if (largo && ancho && prof) { 
-                let vol = Math.round(largo * ancho * prof * 1000); 
-                document.getElementById('litros').innerText = vol.toLocaleString(); 
-                let p = Math.ceil(vol / 20000);
-                document.getElementById('pastillas').innerText = p;
-                let s = Math.round((vol / 10000) * 100);
-                document.getElementById('shock').innerText = s;
-                let mensaje = `Hola! Quisiera encargar los productos para mi piscina de ${vol.toLocaleString()} litros.`;
-                document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(mensaje)}`;
-            } 
+    // Tu función de calculadora se mantiene igual
+    function calcular() { 
+        let largo = document.getElementById('largo').value; 
+        let ancho = document.getElementById('ancho').value; 
+        let prof = document.getElementById('prof').value; 
+        if (largo && ancho && prof) { 
+            let vol = Math.round(largo * ancho * prof * 1000); 
+            document.getElementById('litros').innerText = vol.toLocaleString(); 
+            let p = Math.ceil(vol / 20000);
+            document.getElementById('pastillas').innerText = p;
+            let s = Math.round((vol / 10000) * 100);
+            document.getElementById('shock').innerText = s;
+            let mensaje = `Hola! Quisiera encargar los productos para mi piscina de ${vol.toLocaleString()} litros.`;
+            document.getElementById('wacalc').href = `https://wa.me/543585615079?text=${encodeURIComponent(mensaje)}`;
         } 
-    </script> 
+    }
+</script>
 </body> 
 </html>
