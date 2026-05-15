@@ -23,6 +23,31 @@
 
         body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: auto !important; overflow-x: hidden; } 
 
+        /* --- NUEVOS ESTILOS BARRA DE ANUNCIOS --- */
+        .promo-bar {
+            background-color: var(--azul-vulcano);
+            color: white;
+            overflow: hidden;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .promo-wrapper {
+            display: flex;
+            width: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .promo-slide {
+            min-width: 100%;
+            text-align: center;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* ---------------------------------------- */
+
         .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); } 
         .navbar-brand { color: var(--azul-vulcano) !important; letter-spacing: 1px; } 
         .search-nav { max-width: 400px; width: 100%; } 
@@ -114,6 +139,14 @@
     </style> 
 </head> 
 <body> 
+
+    <div class="promo-bar">
+        <div class="promo-wrapper" id="promoWrapper">
+            <div class="promo-slide">🚚 <b>Envío GRATIS</b> en Río Cuarto (Compras +$20.000)</div>
+            <div class="promo-slide">💳 <b>3 CUOTAS SIN INTERÉS</b> con tarjetas bancarias</div>
+            <div class="promo-slide">⭐ <b>15% DE DESCUENTO</b> pagando con transferencia</div>
+        </div>
+    </div>
 
     <nav class="navbar navbar-expand-lg sticky-top shadow-sm"> 
         <div class="container"> 
@@ -387,30 +420,40 @@
     <script>
     AOS.init({ duration: 1000, once: true });
 
+    // SCRIPT PARA LA BARRA DE ANUNCIOS
+    const promoWrapper = document.getElementById('promoWrapper');
+    const promoSlides = document.querySelectorAll('.promo-slide');
+    let promoIndex = 0;
+
+    function movePromo() {
+        promoIndex++;
+        if (promoIndex >= promoSlides.length) {
+            promoIndex = 0;
+        }
+        promoWrapper.style.transform = `translateX(-${promoIndex * 100}%)`;
+    }
+    setInterval(movePromo, 3500); // Cambia cada 3.5 segundos
+
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.btn-agregar-ajax');
         
         if (btn) {
-            e.preventDefault(); // EVITA QUE LA PÁGINA SE RECARGUE
+            e.preventDefault(); 
             const url = btn.getAttribute('data-url');
 
-            // Hacemos la petición en segundo plano
             fetch(url, {
                 headers: {'X-Requested-With': 'XMLHttpRequest'}
             })
             .then(response => response.text())
             .then(html => {
-                // 1. Parseamos la respuesta para extraer el nuevo modal y el badge
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 
-                // 2. Actualizamos el contenido del modal del carrito
                 const nuevoContenidoModal = doc.querySelector('#modalCarrito .modal-body').innerHTML;
                 const nuevoFooterModal = doc.querySelector('#modalCarrito .modal-footer').innerHTML;
                 document.querySelector('#modalCarrito .modal-body').innerHTML = nuevoContenidoModal;
                 document.querySelector('#modalCarrito .modal-footer').innerHTML = nuevoFooterModal;
 
-                // 3. Actualizamos el numerito (badge) del botón del carrito
                 const nuevoBadge = doc.querySelector('.badge-carrito');
                 const badgeActual = document.querySelector('.badge-carrito');
                 
@@ -418,7 +461,6 @@
                     if (badgeActual) {
                         badgeActual.innerText = nuevoBadge.innerText;
                     } else {
-                        // Si no había badge, lo creamos
                         const span = document.createElement('span');
                         span.className = 'badge-carrito';
                         span.innerText = nuevoBadge.innerText;
@@ -426,7 +468,6 @@
                     }
                 }
 
-                // 4. Abrimos el modal sin recargar
                 var modalEl = document.getElementById('modalCarrito');
                 var myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
                 myModal.show();
@@ -435,7 +476,6 @@
         }
     });
 
-    // Tu función de calculadora se mantiene igual
     function calcular() { 
         let largo = document.getElementById('largo').value; 
         let ancho = document.getElementById('ancho').value; 
