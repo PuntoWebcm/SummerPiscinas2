@@ -23,7 +23,7 @@
 
         body { font-family: 'Roboto', sans-serif; background-color: var(--gris-claro); scroll-behavior: auto !important; overflow-x: hidden; } 
 
-        /* --- NUEVOS ESTILOS BARRA DE ANUNCIOS --- */
+        /* --- BARRA DE ANUNCIOS ANCLADA --- */
         .promo-bar {
             background-color: var(--azul-vulcano);
             color: white;
@@ -32,7 +32,10 @@
             display: flex;
             align-items: center;
             font-size: 0.85rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: fixed; /* La anclamos arriba */
+            top: 0;
+            width: 100%;
+            z-index: 2000; /* Por encima de todo */
         }
         .promo-wrapper {
             display: flex;
@@ -46,9 +49,15 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
+        /* AJUSTE PARA LA NAVBAR PARA QUE NO SE TAPE */
+        .navbar { 
+            background-color: white !important; 
+            border-bottom: 3px solid var(--azul-vulcano); 
+            top: 38px !important; /* La bajamos exactamente lo que mide la barra de arriba */
+        } 
         /* ---------------------------------------- */
 
-        .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); } 
         .navbar-brand { color: var(--azul-vulcano) !important; letter-spacing: 1px; } 
         .search-nav { max-width: 400px; width: 100%; } 
          
@@ -102,6 +111,7 @@
             background-position: center; 
             color: white; 
             padding: 140px 0; 
+            margin-top: 38px; /* Espacio extra para compensar la barra fija */
         } 
 
         .product-card, .service-card { border: none; border-radius: 0; transition: all 0.3s ease-in-out; background: white; } 
@@ -420,7 +430,7 @@
     <script>
     AOS.init({ duration: 1000, once: true });
 
-    // SCRIPT PARA LA BARRA DE ANUNCIOS
+    // JS BARRA DE ANUNCIOS
     const promoWrapper = document.getElementById('promoWrapper');
     const promoSlides = document.querySelectorAll('.promo-slide');
     let promoIndex = 0;
@@ -430,9 +440,11 @@
         if (promoIndex >= promoSlides.length) {
             promoIndex = 0;
         }
-        promoWrapper.style.transform = `translateX(-${promoIndex * 100}%)`;
+        if (promoWrapper) {
+            promoWrapper.style.transform = `translateX(-${promoIndex * 100}%)`;
+        }
     }
-    setInterval(movePromo, 3500); // Cambia cada 3.5 segundos
+    setInterval(movePromo, 3500);
 
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.btn-agregar-ajax');
