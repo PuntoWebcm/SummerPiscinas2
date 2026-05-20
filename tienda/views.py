@@ -136,45 +136,70 @@ def checkout_carrito(request):
 
 
 def pago_seleccion(request):
-    """ Paso 2: Procesa la preferencia de Mercado Pago de forma limpia """
+    """ Paso 2: Procesa la preferencia de Mercado Pago de forma limpia y compatible """
     pedido_id = request.session.get('pedido_id')
+    if not pedido_id:
+        return redirect('home')
+        
     pedido = get_object_or_404(Pedido, id=pedido_id)
     
-    sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+    try:
+        sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
 
-    preference_data = {
-        "items": [
-            {
-                "title": f"Compra en SUMMER PISCINAS - Pedido #{pedido.id}",
-                "quantity": 1,
-                "unit_price": float(pedido.total),
-                "currency_id": "ARS",
-            }
-        ],
-        "back_urls": {
-            "success": f"{DOMAIN}/pago-exitoso/",
-            "failure": f"{DOMAIN}/",
-            "pending": f"{DOMAIN}/pago-exitoso/"
-        },
-        "auto_return": "approved",
-        "binary_mode": True,
-    }
+        preference_data = {
+            "items": [
+                {
+                    "title": f"Compra en SUMMER PISCINAS - Pedido #{pedido.id}",
+                    "quantity": 1,
+                    "unit_price": float(pedido.total),
+                    "currency_id": "ARS",
+                }
+            ],
+            "back_urls": {
+                "success": f"{DOMAIN}/pago-exitoso/",
+                "failure": f"{DOMAIN}/",
+                "pending": f"{DOMAIN}/pago-exitoso/"
+            },
+            "auto_return": "approved",
+            "binary_mode": True,
+        }
 
-    preference_response = sdk.preference().create(preference_data)
-    preference = preference_response["response"]
-    
-    preference_id = preference.get('id', '')
-    init_point = preference.get('init_point', '#')
+        preference_response = sdk.preference().create(preference_data)
+        
+        # COMPATIBILIDAD DE SDK: Soportar tanto formato objeto como diccionario antiguo
+        if hasattr(preference_response, "get"):
+            preference = preference_response.get("response", {})
+        else:
+            preference = getattr(preference_response, "response", {})
+        
+        # Extraer IDs de forma segura
+        preference_id = preference.get('id', '') if preference else ''
+        init_point = preference.get('init_point', '#') if preference else '#'
 
-    # Guardamos el id de preferencia por control
-    pedido.mp_preference_id = preference_id
-    pedido.save()
+        if not preference_id:
+            # Si Mercado Pago rechazó las credenciales, lo capturamos acá
+            return render(request, 'tienda/checkout_carrito.html', {
+                'total_carrito': pedido.total, 
+                'error': f"Error de Mercado Pago: Respuesta inválida. Estructura obtenida: {preference_response}"
+            })
 
-    return render(request, 'tienda/pago_seleccion.html', {
-        'pedido': pedido,
-        'preference_id': preference_id,
-        'init_point': init_point
-    })
+        # Guardamos el id de preferencia de manera segura si existe en el modelo
+        if hasattr(pedido, 'mp_preference_id'):
+            pedido.mp_preference_id = preference_id
+            pedido.save()
+
+        return render(request, 'tienda/pago_seleccion.html', {
+            'pedido': pedido,
+            'preference_id': preference_id,
+            'init_point': init_point
+        })
+
+    except Exception as e:
+        # En vez de dar Error 500, nos muestra el error real (Ej: Token vencido, campo faltante, etc.)
+        return render(request, 'tienda/checkout_carrito.html', {
+            'total_carrito': pedido.total, 
+            'error': f"Excepción en el servidor: {str(e)}"
+        })
 
 
 def pago_exitoso(request):

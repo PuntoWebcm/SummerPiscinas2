@@ -1,0 +1,57 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar Pago | Summer Piscinas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --azul-vulcano: #003366;
+            --celeste-agua: #00a8e8;
+        }
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+        .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
+        .checkout-box { background: white; max-width: 600px; margin: 60px auto; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-mp { background-color: #009ee3; color: white; font-weight: bold; padding: 15px; width: 100%; border-radius: 0; text-align: center; display: block; text-decoration: none; transition: 0.3s; }
+        .btn-mp:hover { background-color: #0081bc; color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/" style="color: var(--azul-vulcano);">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="checkout-box text-center">
+            <i class="fas fa-wallet fa-3x mb-3" style="color: var(--azul-vulcano);"></i>
+            <h2 class="fw-bold mb-3" style="color: var(--azul-vulcano);">¡Pedido Reservado!</h2>
+            <p class="text-muted lead">Tu pedido <strong>#{{ pedido.id }}</strong> se registró correctamente.</p>
+            
+            <hr class="my-4">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <span class="fs-5 fw-bold text-muted">Total a pagar:</span>
+                <span class="fs-3 fw-bold" style="color: var(--azul-vulcano);">$ {{ pedido.total|intcomma }}</span>
+            </div>
+
+            <a href="{{ init_point }}" class="btn btn-mp btn-lg shadow-sm">
+                <i class="fas fa-credit-card me-2"></i> PAGAR CON MERCADO PAGO
+            </a>
+
+            <a href="/" class="btn btn-link text-muted mt-4 text-decoration-none d-block">← Cancelar y volver al inicio</a>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 text-muted fixed-bottom">
+        <small>© 2026 Summer Piscinas - Especialistas en Agua</small>
+    </footer>
+
+</body>
+</html>
