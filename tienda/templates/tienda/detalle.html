@@ -103,13 +103,13 @@
                 </div>
 
                 <div class="d-grid gap-3">
-                    <a href="{% url 'checkout' producto.id %}" class="btn btn-vulcano btn-lg shadow-sm">
+                    <a href="{% url 'agregar' producto.id %}?show_carrito=1" class="btn btn-vulcano btn-lg shadow-sm mantener-scroll">
                         <i class="fas fa-shopping-cart me-2"></i> COMPRAR AHORA
                     </a>
 
-                    <button type="button" data-url="{% url 'agregar' producto.id %}" class="btn btn-outline-azul btn-lg shadow-sm btn-agregar-ajax">
+                    <a href="{% url 'agregar' producto.id %}?show_carrito=1" class="btn btn-outline-azul btn-lg shadow-sm mantener-scroll">
                         <i class="fas fa-cart-plus me-2"></i> AGREGAR AL CARRITO
-                    </button>
+                    </a>
 
                     <a href="https://wa.me/543585615079?text=Hola,%20me%20interesa%20el%20producto:%20{{ producto.nombre }}" 
                        target="_blank" class="btn btn-whatsapp btn-lg shadow-sm">
@@ -143,7 +143,7 @@
                                         <div class="btn-group btn-group-sm"> 
                                             <a href="{% url 'restar' value.producto_id %}?show_carrito=1" class="btn btn-outline-secondary mantener-scroll">-</a> 
                                             <span class="px-2 py-1">{{ value.cantidad }}</span> 
-                                            <button type="button" data-url="{% url 'agregar' value.producto_id %}" class="btn btn-outline-secondary btn-agregar-ajax">+</button> 
+                                            <a href="{% url 'agregar' value.producto_id %}?show_carrito=1" class="btn btn-outline-secondary mantener-scroll">+</a> 
                                         </div> 
                                     </td> 
                                     <td class="fw-bold">$ {{ value.total|intcomma }}</td> 
@@ -171,62 +171,33 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // MANEJO DE AJAX PARA AGREGAR PRODUCTOS
+        // DESACTIVAR EL COMPORTAMIENTO AUTOMÁTICO DE NAVEGADORES (Evita saltos bruscos en móviles)
+        if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+
+        // CAPTURA DE POSICIÓN ANTES DE RECARGAR
         document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn-agregar-ajax');
-            const linkScroll = e.target.closest('.mantener-scroll');
-
+            const btn = e.target.closest('.mantener-scroll');
             if (btn) {
-                e.preventDefault();
-                const url = btn.getAttribute('data-url');
-
-                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    
-                    // Actualizar contenido del modal
-                    const nuevoBody = doc.querySelector('#modalCarrito .modal-body').innerHTML;
-                    const nuevoFooter = doc.querySelector('#modalCarrito .modal-footer').innerHTML;
-                    document.querySelector('#modalCarrito .modal-body').innerHTML = nuevoBody;
-                    document.querySelector('#modalCarrito .modal-footer').innerHTML = nuevoFooter;
-
-                    // Actualizar Badge del Carrito
-                    const nuevoBadge = doc.querySelector('.badge-carrito');
-                    const badgeActual = document.querySelector('.badge-carrito');
-                    
-                    if (nuevoBadge) {
-                        if (badgeActual) {
-                            badgeActual.innerText = nuevoBadge.innerText;
-                        } else {
-                            const span = document.createElement('span');
-                            span.className = 'badge-carrito';
-                            span.innerText = nuevoBadge.innerText;
-                            document.querySelector('.btn-fixed-carrito').appendChild(span);
-                        }
-                    }
-
-                    // Mostrar Modal
-                    var modalEl = document.getElementById('modalCarrito');
-                    var myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                    myModal.show();
-                });
-            }
-
-            // Para restar/eliminar, seguimos usando el método de guardar scroll por si recarga
-            if (linkScroll) {
                 localStorage.setItem('scrollPos', window.scrollY);
             }
         });
 
-        // Restaurar posición de scroll si hubo recarga (para botones de restar/eliminar)
-        window.addEventListener('load', function() {
+        // FUNCIÓN CONTROLADA DE RESTAURACIÓN DE SCROLL
+        function restaurarPosicion() {
             const scrollPos = localStorage.getItem('scrollPos');
             if (scrollPos) {
                 window.scrollTo(0, parseInt(scrollPos));
-                localStorage.removeItem('scrollPos');
+                setTimeout(() => window.scrollTo(0, parseInt(scrollPos)), 30);
             }
+        }
+
+        // Ejecutar de manera inmediata apenas renderiza el árbol DOM básico
+        restaurarPosicion();
+
+        // Control de apertura del Modal al cargar con parámetros URL
+        window.addEventListener('load', function() {
+            restaurarPosicion();
+            localStorage.removeItem('scrollPos');
 
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('show_carrito') === '1') { 

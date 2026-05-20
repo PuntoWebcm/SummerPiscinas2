@@ -1,9 +1,16 @@
 import mercadopago
-from django.conf import settings
+import requests
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
+from django.db.models import Q
 from .models import Producto, Pedido, DetallePedido, Categoria 
 from .carrito import Carrito
-from django.db.models import Q
+from urllib.parse import quote
+
+# --- CONFIGURACIÓN DE DOMINIO Y BOT ---
+DOMAIN = "https://summerpiscinas.onrender.com"  # Cambialo por tu dominio real si cambia
+MI_NUMERO_WHATSAPP = "543585615079"              # Tu número donde vas a recibir la notificación
+API_KEY_CALLMEBOT = "2153232"                   # Tu API Key de CallMeBot
 
 # --- HOME CON BUSCADOR ---
 def home(request):
@@ -16,16 +23,16 @@ def home(request):
     if query:
         limpieza = limpieza_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
         piletas = piletas_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
-        inflables_list = inflables_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
+        inflables = inflables_qs.filter(Q(nombre__icontains=query) | Q(descripcion__icontains=query))
     else:
         limpieza = limpieza_qs[:4]
         piletas = piletas_qs[:4]
-        inflables_list = inflables_qs[:4]
+        inflables = inflables_qs[:4]
 
     context = {
         'limpieza': limpieza,
         'piletas': piletas,
-        'inflables': inflables_list,
+        'inflables': inflables,
     }
     return render(request, 'tienda/index.html', context)
 
@@ -47,15 +54,10 @@ def detalle_producto(request, pk):
     return render(request, 'tienda/detalle.html', {'producto': producto})
 
 # --- GESTIÓN DEL CARRITO ---
-
 def agregar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
-    
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'tienda/index.html')
-        
     referer = request.META.get('HTTP_REFERER', '/')
     return redirect(referer)
 
@@ -80,27 +82,15 @@ def limpiar_carrito(request):
     carrito.limpiar()
     return redirect('home')
 
-# --- CHECKOUT Y RETORNO DE PAGO ---
 
-def pago_exitoso(request):
-    """
-    Esta vista recibe al cliente después de pagar en Mercado Pago.
-    """
-    carrito = Carrito(request)
-    carrito.limpiar() # Limpiamos el carrito al confirmar éxito
-    
-    # Intentamos traer el pedido más reciente de forma segura
-    try:
-        pedido = Pedido.objects.latest('id')
-    except Pedido.DoesNotExist:
-        pedido = None
-        
-    return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido})
+# --- NUEVO FLUJO DE CHECKOUT Y PASARELA (COMO SIGMA) ---
 
 def checkout_carrito(request):
-    carrito_instancia = Carrito(request)
+    """ Paso 1: Recibe los datos del cliente y crea el Pedido en Base de Datos """
     carrito_session = request.session.get("carrito", {})
-    if not carrito_session: return redirect('home')
+    if not carrito_session: 
+        return redirect('home')
+        
     total_carrito = sum(float(item['total']) for item in carrito_session.values())
 
     if request.method == 'POST':
@@ -111,6 +101,7 @@ def checkout_carrito(request):
         direccion = request.POST.get('direccion')
         metodo = request.POST.get('metodo_pago')
 
+        # Creamos el registro del pedido pendiente
         pedido = Pedido.objects.create(
             nombre_completo=nombre, 
             email=email, 
@@ -119,85 +110,135 @@ def checkout_carrito(request):
             direccion=direccion, 
             total=total_carrito, 
             metodo_pago=metodo, 
-            estado_pago='PE'
+            estado_pago='PE'  # Pendiente
         )
         
-        items_mp = []
+        # Guardamos los productos en el detalle
         for item in carrito_session.values():
             prod_obj = Producto.objects.get(id=item['producto_id'])
-            DetallePedido.objects.create(pedido=pedido, producto=prod_obj, cantidad=item['cantidad'], precio_unitario=item['precio'])
-            items_mp.append({"title": item['nombre'], "quantity": int(item['cantidad']), "unit_price": float(item['precio']), "currency_id": "ARS"})
+            DetallePedido.objects.create(
+                pedido=pedido, 
+                producto=prod_obj, 
+                cantidad=item['cantidad'], 
+                precio_unitario=item['precio']
+            )
 
+        request.session['pedido_id'] = pedido.id
+        
+        # Redirección según método elegido
         if metodo == 'MP':
-            try:
-                sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-                success_url = request.build_absolute_uri('/pago-exitoso/')
-                preference_data = {
-                    "items": items_mp, 
-                    "back_urls": {
-                        "success": success_url, 
-                        "failure": request.build_absolute_uri('/'), 
-                        "pending": success_url
-                    }, 
-                    "auto_return": "approved", 
-                    "binary_mode": True, 
-                    "statement_descriptor": "SUMMER PISCINAS"
-                }
-                preference_response = sdk.preference().create(preference_data)
-                preference = preference_response.get("response")
-                if preference and "id" in preference:
-                    pedido.mp_preference_id = preference["id"]
-                    pedido.save()
-                    return redirect(preference["init_point"])
-            except Exception as e:
-                return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito, 'error': str(e)})
+            return redirect('pago_seleccion')
         else:
-            # Transferencia
-            return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido, 'transferencia': True})
+            # Si es Transferencia bancaria, va directo a éxito con flag de transferencia
+            return redirect(f"/pago-exitoso/?metodo=transferencia")
             
     return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito})
 
-def procesar_compra(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id)
-    if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        email = request.POST.get('email')
-        whatsapp = request.POST.get('whatsapp')
-        localidad = request.POST.get('localidad')
-        direccion = request.POST.get('direccion')
-        metodo = request.POST.get('metodo_pago')
+
+def pago_seleccion(request):
+    """ Paso 2: Procesa la preferencia de Mercado Pago de forma limpia """
+    pedido_id = request.session.get('pedido_id')
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    
+    sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+
+    preference_data = {
+        "items": [
+            {
+                "title": f"Compra en SUMMER PISCINAS - Pedido #{pedido.id}",
+                "quantity": 1,
+                "unit_price": float(pedido.total),
+                "currency_id": "ARS",
+            }
+        ],
+        "back_urls": {
+            "success": f"{DOMAIN}/pago-exitoso/",
+            "failure": f"{DOMAIN}/",
+            "pending": f"{DOMAIN}/pago-exitoso/"
+        },
+        "auto_return": "approved",
+        "binary_mode": True,
+    }
+
+    preference_response = sdk.preference().create(preference_data)
+    preference = preference_response["response"]
+    
+    preference_id = preference.get('id', '')
+    init_point = preference.get('init_point', '#')
+
+    # Guardamos el id de preferencia por control
+    pedido.mp_preference_id = preference_id
+    pedido.save()
+
+    return render(request, 'tienda/pago_seleccion.html', {
+        'pedido': pedido,
+        'preference_id': preference_id,
+        'init_point': init_point
+    })
+
+
+def pago_exitoso(request):
+    """ Paso 3: Éxito total. Descuenta stock, limpia sesión y avisa por WhatsApp al dueño """
+    payment_id = request.GET.get('collection_id') or request.GET.get('payment_id') or "Transferencia"
+    metodo_url = request.GET.get('metodo')
+    
+    pedido_id = request.session.get('pedido_id')
+    
+    if pedido_id:
+        pedido = get_object_or_404(Pedido, id=pedido_id)
+    else:
+        # En caso de emergencia o recarga de página, trae el último
+        pedido = Pedido.objects.latest('id')
+
+    # Si viene desde Mercado Pago o se confirma transferencia, marcar pagado
+    pedido.estado_pago = 'AP'  # Aprobado
+    pedido.save()
+    
+    # Procesar detalles, armar texto y descontar stock
+    detalles = DetallePedido.objects.filter(pedido=pedido)
+    detalle_productos = ""
+    
+    for item in detalles:
+        detalle_productos += f"- {item.cantidad}x {item.producto.nombre}\n"
         
-        pedido = Pedido.objects.create(
-            nombre_completo=nombre, 
-            email=email, 
-            whatsapp=whatsapp, 
-            localidad=localidad, 
-            direccion=direccion, 
-            total=producto.precio, 
-            metodo_pago=metodo, 
-            estado_pago='PE'
+        # Descuento de stock si tu modelo Producto maneja el campo .stock
+        if hasattr(item.producto, 'stock'):
+            producto = item.producto
+            producto.stock = max(0, producto.stock - item.quantity)
+            producto.save()
+
+    # --- ENVÍO DE NOTIFICACIÓN WHATSAPP VIA CALLMEBOT ---
+    try:
+        tipo_pago = "TRANSFERENCIA BANCARIA" if metodo_url == 'transferencia' else f"MERCADO PAGO (ID: {payment_id})"
+        
+        mensaje_texto = (
+            f"🌊 *NUEVA VENTA SUMMER PISCINAS*\n\n"
+            f"📦 *Pedido:* #{pedido.id}\n"
+            f"👤 *Cliente:* {pedido.nombre_completo}\n"
+            f"📱 *WhatsApp Cliente:* {pedido.whatsapp}\n"
+            f"📍 *Localidad:* {pedido.localidad}\n"
+            f"🏠 *Dirección:* {pedido.direccion}\n\n"
+            f"🛒 *Productos:*\n{detalle_productos}\n"
+            f"💰 *Total Cobrado:* ${float(pedido.total)}\n"
+            f"💳 *Método:* {tipo_pago}"
         )
-        DetallePedido.objects.create(pedido=pedido, producto=producto, cantidad=1, precio_unitario=producto.precio)
+
+        mensaje_url = quote(mensaje_texto)
+        url_bot = f"https://api.callmebot.com/whatsapp.php?phone={MI_NUMERO_WHATSAPP}&text={mensaje_url}&apikey={API_KEY_CALLMEBOT}"
         
-        if metodo == 'MP':
-            try:
-                sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-                success_url = request.build_absolute_uri('/pago-exitoso/')
-                preference_data = {
-                    "items": [{"title": str(producto.nombre), "quantity": 1, "unit_price": float(producto.precio), "currency_id": "ARS"}], 
-                    "back_urls": {"success": success_url}, 
-                    "auto_return": "approved", 
-                    "binary_mode": True
-                }
-                preference_response = sdk.preference().create(preference_data)
-                preference = preference_response.get("response")
-                if preference and "id" in preference:
-                    pedido.mp_preference_id = preference["id"]
-                    pedido.save()
-                    return redirect(preference["init_point"])
-            except Exception: 
-                return render(request, 'tienda/checkout.html', {'producto': producto, 'error': 'Error MP'})
-        else: 
-            return render(request, 'tienda/pago_confirmado.html', {'pedido': pedido, 'transferencia': True})
-            
-    return render(request, 'tienda/checkout.html', {'producto': producto})
+        requests.get(url_bot, timeout=10)
+    except Exception as e:
+        print(f"Error enviando notificación: {e}")
+    
+    # Limpiamos el carrito de la sesión
+    carrito = Carrito(request)
+    carrito.limpiar()
+    
+    # Quitamos el ID de pedido de la sesión para dejarla lista para otra compra
+    if 'pedido_id' in request.session:
+        del request.session['pedido_id']
+        
+    return render(request, 'tienda/pago_confirmado.html', {
+        'pedido': pedido, 
+        'transferencia': (metodo_url == 'transferencia')
+    })
