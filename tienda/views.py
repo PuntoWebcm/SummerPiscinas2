@@ -58,9 +58,15 @@ def agregar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
     carrito.agregar(producto)
+    
+    # Obtenemos de dónde viene el click
     referer = request.META.get('HTTP_REFERER', '/')
-    return redirect(referer)
-
+    
+    # Limpiamos cualquier parámetro viejo que tenga el referer (como un ?buscar= o ?show_carrito= previo)
+    base_url = referer.split('?')[0]
+    
+    # Redireccionamos a la misma página asegurando que se abra el modal del carrito
+    return redirect(f"{base_url}?show_carrito=1")
 def eliminar_producto(request, producto_id):
     carrito = Carrito(request)
     producto = get_object_or_404(Producto, id=producto_id)
@@ -125,12 +131,8 @@ def checkout_carrito(request):
 
         request.session['pedido_id'] = pedido.id
         
-        # Redirección según método elegido
-        if metodo == 'MP':
-            return redirect('pago_seleccion')
-        else:
-            # Si es Transferencia bancaria, va directo a éxito con flag de transferencia
-            return redirect(f"/pago-exitoso/?metodo=transferencia")
+        # CAMBIO CLAVE: Redireccionamos SIEMPRE a la pantalla de selección (estilo Sigma)
+        return redirect('pago_seleccion')
             
     return render(request, 'tienda/checkout_carrito.html', {'total_carrito': total_carrito})
 
@@ -177,7 +179,6 @@ def pago_seleccion(request):
         init_point = preference.get('init_point', '#') if preference else '#'
 
         if not preference_id:
-            # Si Mercado Pago rechazó las credenciales, lo capturamos acá
             return render(request, 'tienda/checkout_carrito.html', {
                 'total_carrito': pedido.total, 
                 'error': f"Error de Mercado Pago: Respuesta inválida. Estructura obtenida: {preference_response}"
@@ -195,7 +196,6 @@ def pago_seleccion(request):
         })
 
     except Exception as e:
-        # En vez de dar Error 500, nos muestra el error real (Ej: Token vencido, campo faltante, etc.)
         return render(request, 'tienda/checkout_carrito.html', {
             'total_carrito': pedido.total, 
             'error': f"Excepción en el servidor: {str(e)}"
@@ -212,11 +212,15 @@ def pago_exitoso(request):
     if pedido_id:
         pedido = get_object_or_404(Pedido, id=pedido_id)
     else:
-        # En caso de emergencia o recarga de página, trae el último
         pedido = Pedido.objects.latest('id')
 
     # Si viene desde Mercado Pago o se confirma transferencia, marcar pagado
     pedido.estado_pago = 'AP'  # Aprobado
+    
+    # Si vino por la URL de transferencia, actualizamos el método en el modelo
+    if metodo_url == 'transferencia':
+        pedido.metodo_pago = 'TR' # O la sigla que use tu modelo para Transferencias
+    
     pedido.save()
     
     # Procesar detalles, armar texto y descontar stock
@@ -229,7 +233,7 @@ def pago_exitoso(request):
         # Descuento de stock si tu modelo Producto maneja el campo .stock
         if hasattr(item.producto, 'stock'):
             producto = item.producto
-            producto.stock = max(0, producto.stock - item.quantity)
+            producto.stock = max(0, producto.stock - item.cantidad)
             producto.save()
 
     # --- ENVÍO DE NOTIFICACIÓN WHATSAPP VIA CALLMEBOT ---

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seleccionar Pago | Summer Piscinas</title>
+    <title>Método de Pago | Summer Piscinas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,44 +12,192 @@
         :root {
             --azul-vulcano: #003366;
             --celeste-agua: #00a8e8;
+            --bg-gris: #f8f9fa;
         }
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-gris); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
-        .checkout-box { background: white; max-width: 600px; margin: 60px auto; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-mp { background-color: #009ee3; color: white; font-weight: bold; padding: 15px; width: 100%; border-radius: 0; text-align: center; display: block; text-decoration: none; transition: 0.3s; }
-        .btn-mp:hover { background-color: #0081bc; color: white; }
+        
+        /* Contenedor idéntico al de tu captura de Sigma */
+        .payment-container { 
+            background: white; 
+            max-width: 550px; 
+            margin: 40px auto; 
+            padding: 35px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border-radius: 4px;
+        }
+        
+        .title-payment {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: 0.5px;
+        }
+        
+        .order-subtitle {
+            font-size: 0.85rem;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .price-row {
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-total {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #8b0000; /* Color rojo/bordó oscuro de la captura */
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #888;
+            letter-spacing: 0.5px;
+        }
+
+        /* Botón Mercado Pago Estilo Oficial */
+        .btn-mercadopago {
+            background-color: #fff159;
+            color: #111;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 14px;
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .btn-mercadopago:hover {
+            background-color: #e6d812;
+            color: #111;
+        }
+        .btn-mercadopago img {
+            height: 22px;
+            margin-right: 8px;
+        }
+
+        .secure-text {
+            font-size: 0.75rem;
+            color: #009ee3;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* Caja de Transferencia Bancaria Estilo Sigma */
+        .transfer-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+            transition: border-color 0.2s, background-color 0.2s;
+            position: relative;
+        }
+        .transfer-box:hover {
+            border-color: var(--azul-vulcano);
+            background-color: #fafafa;
+            color: inherit;
+        }
+        .transfer-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #111;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .transfer-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0;
+        }
+        .badge-discount {
+            background-color: #111;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .footer-secure {
+            font-size: 0.7rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar navbar-light bg-white shadow-sm">
-        <div class="container">
+        <div class="container justify-content-center">
             <a class="navbar-brand fw-bold" href="/" style="color: var(--azul-vulcano);">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="checkout-box text-center">
-            <i class="fas fa-wallet fa-3x mb-3" style="color: var(--azul-vulcano);"></i>
-            <h2 class="fw-bold mb-3" style="color: var(--azul-vulcano);">¡Pedido Reservado!</h2>
-            <p class="text-muted lead">Tu pedido <strong>#{{ pedido.id }}</strong> se registró correctamente.</p>
+    <div class="container flex-grow-1">
+        <div class="payment-container text-center">
             
-            <hr class="my-4">
+            <h2 class="title-payment mb-1">MÉTODO DE PAGO</h2>
+            <p class="order-subtitle mb-4">Pedido #{{ pedido.id }}</p>
             
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <span class="fs-5 fw-bold text-muted">Total a pagar:</span>
-                <span class="fs-3 fw-bold" style="color: var(--azul-vulcano);">$ {{ pedido.total|intcomma }}</span>
+            <div class="price-row d-flex justify-content-between align-items-center mb-4">
+                <span class="fw-bold text-muted text-uppercase" style="font-size: 0.85rem;">Total a pagar:</span>
+                <span class="price-total">$ {{ pedido.total|intcomma }}</span>
             </div>
 
-            <a href="{{ init_point }}" class="btn btn-mp btn-lg shadow-sm">
-                <i class="fas fa-credit-card me-2"></i> PAGAR CON MERCADO PAGO
-            </a>
+            <div class="text-start mb-2">
+                <span class="section-label text-uppercase">Pagar con tarjeta o Mercado Pago</span>
+            </div>
+            
+            <div class="mb-2">
+                <a href="{{ init_point }}" class="btn-mercadopago shadow-sm">
+                    <img src="https://imgmp.mpheaders.com/4371_logo.png" alt="Mercado Pago">
+                </a>
+            </div>
+            <div class="mb-4">
+                <a href="{{ init_point }}" class="secure-text">Pagá de forma segura</a>
+            </div>
 
-            <a href="/" class="btn btn-link text-muted mt-4 text-decoration-none d-block">← Cancelar y volver al inicio</a>
+            <div class="my-4 border-top"></div>
+
+            <div class="mb-4">
+                <a href="/pago-exitoso/?metodo=transferencia" class="transfer-box text-start">
+                    <div class="transfer-title">Transferencia Bancaria</div>
+                    <div class="transfer-desc">Obtené los datos de la cuenta al finalizar</div>
+                    <span class="badge-discount">10% OFF</span>
+                </a>
+            </div>
+
+            <div class="mt-4 pt-2">
+                <span class="footer-secure"><i class="fas fa-lock me-1"></i> Pago seguro procesado por Mercado Pago</span>
+            </div>
+
         </div>
     </div>
 
-    <footer class="text-center py-4 text-muted fixed-bottom">
+    <footer class="text-center py-4 text-muted mt-auto">
         <small>© 2026 Summer Piscinas - Especialistas en Agua</small>
     </footer>
 
