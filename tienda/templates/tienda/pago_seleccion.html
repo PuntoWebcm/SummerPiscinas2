@@ -4,79 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Método de Pago | Summer Piscinas</title>
+    <title>Metodo de Pago | Summer Piscinas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --azul-vulcano: #003366;
-            --celeste-agua: #00a8e8;
-            --bg-gris: #f8f9fa;
-        }
         body { 
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--bg-gris); 
+            font-family: sans-serif; 
+            background-color: #f8f9fa; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
-        
+        .navbar { 
+            background-color: white !important; 
+            border-bottom: 3px solid #003366; 
+        }
         .payment-container { 
             background: white; 
-            max-width: 550px; 
+            max-width: 530px; 
             margin: 40px auto; 
             padding: 35px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
             border-radius: 4px;
         }
-        
-        .title-payment {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            letter-spacing: 0.5px;
-        }
-        
-        .order-subtitle {
-            font-size: 0.85rem;
-            color: #777;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         .price-row {
             padding: 15px 0;
             border-top: 1px solid #eee;
             border-bottom: 1px solid #eee;
         }
-
-        .price-total {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #8b0000; 
-        }
-
-        .section-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #888;
-            letter-spacing: 0.5px;
-        }
-
         .btn-mercadopago {
             background-color: #fff159;
             color: #111;
-            font-weight: 600;
+            font-weight: bold;
             font-size: 1.15rem;
             padding: 14px;
             width: 100%;
             border: none;
             border-radius: 4px;
             text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
             text-decoration: none;
             transition: background-color 0.2s;
         }
@@ -84,113 +49,74 @@
             background-color: #e6d812;
             color: #111;
         }
-
-        .secure-text {
-            font-size: 0.75rem;
-            color: #009ee3;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
         .transfer-box {
             border: 1px solid #e0e0e0;
             border-radius: 4px;
             padding: 20px;
             text-decoration: none;
             display: block;
-            color: inherit;
-            transition: border-color 0.2s, background-color 0.2s;
-            position: relative;
+            color: #111;
+            transition: border-color 0.2s;
         }
         .transfer-box:hover {
-            border-color: var(--azul-vulcano);
+            border-color: #003366;
             background-color: #fafafa;
-            color: inherit;
-        }
-        .transfer-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #111;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-        .transfer-desc {
-            font-size: 0.85rem;
-            color: #666;
-            margin: 0;
-        }
-        .badge-discount {
-            background-color: #111;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 4px;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .footer-secure {
-            font-size: 0.7rem;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-light bg-white shadow-sm">
-        <div class="container justify-content-center">
-            <a class="navbar-brand fw-bold" href="/" style="color: var(--azul-vulcano);">SUMMER <span style="color: var(--celeste-agua);">PISCINAS</span></a>
+    <nav class="navbar navbar-light bg-white shadow-sm py-3">
+        <div class="container text-center">
+            <h4 class="m-0 mx-auto" style="color: #003366; font-weight: bold; letter-spacing: 1px;">
+                SUMMER <span style="color: #00a8e8;">PISCINAS</span>
+            </h4>
         </div>
     </nav>
 
     <div class="container flex-grow-1">
         <div class="payment-container text-center">
             
-            <h2 class="title-payment mb-1">MÉTODO DE PAGO</h2>
-            <p class="order-subtitle mb-4">Pedido #{{ pedido.id }}</p>
+            <h3 class="fw-bold mb-1" style="color: #1a1a1a; font-size: 1.5rem;">METODO DE PAGO</h3>
+            <p class="text-muted small text-uppercase mb-4">Pedido #{{ pedido.id }}</p>
             
             <div class="price-row d-flex justify-content-between align-items-center mb-4">
-                <span class="fw-bold text-muted text-uppercase" style="font-size: 0.85rem;">Total a pagar:</span>
-                <span class="price-total">$ {{ pedido.total|intcomma }}</span>
+                <span class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Total a pagar:</span>
+                <span class="fw-bold" style="font-size: 1.6rem; color: #8b0000;">$ {{ pedido.total|intcomma }}</span>
             </div>
 
             <div class="text-start mb-2">
-                <span class="section-label text-uppercase">Pagar con tarjeta o Mercado Pago</span>
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem;">Pagar con tarjeta o Mercado Pago</span>
             </div>
             
             <div class="mb-2">
-                <a href="{{ init_point }}" class="btn-mercadopago shadow-sm text-decoration-none">
-                    <i class="fas fa-credit-card me-2"></i> Pagar con Mercado Pago
+                <a href="{{ init_point }}" class="btn-mercadopago shadow-sm">
+                    Pagar con Mercado Pago
                 </a>
             </div>
             <div class="mb-4">
-                <a href="{{ init_point }}" class="secure-text">Pagá de forma segura</a>
+                <a href="{{ init_point }}" class="small fw-bold text-decoration-none" style="color: #009ee3;">Paga de forma segura</a>
             </div>
 
             <div class="my-4 border-top"></div>
 
             <div class="mb-4">
-                <a href="/pago-exitoso/?metodo=transferencia" class="transfer-box text-start">
-                    <div class="transfer-title">Transferencia Bancaria</div>
-                    <div class="transfer-desc">Obtené los datos de la cuenta al finalizar</div>
-                    <span class="badge-discount">10% OFF</span>
+                <a href="/pago-exitoso/?metodo=transferencia" class="transfer-box text-start position-relative">
+                    <div class="fw-bold text-uppercase" style="font-size: 0.95rem;">Transferencia Bancaria</div>
+                    <div class="text-muted small">Obtene los datos de la cuenta al finalizar</div>
+                    <span class="badge bg-dark position-absolute end-0 top-50 translate-middle-y me-3" style="font-size: 0.7rem;">10% OFF</span>
                 </a>
             </div>
 
-            <div class="mt-4 pt-2">
-                <span class="footer-secure"><i class="fas fa-lock me-1"></i> Pago seguro procesado por Mercado Pago</span>
+            <div class="mt-4 pt-2 text-muted small text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                Pago seguro procesado por Mercado Pago
             </div>
 
         </div>
     </div>
 
-    <footer class="text-center py-4 text-muted mt-auto">
-        <small>© 2026 Summer Piscinas - Especialistas en Agua</small>
+    <footer class="text-center py-4 text-muted mt-auto" style="font-size: 0.8rem;">
+        © 2026 Summer Piscinas - Especialistas en Agua
     </footer>
 
 </body>
