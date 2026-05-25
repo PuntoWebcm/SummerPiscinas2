@@ -212,28 +212,30 @@ def pago_exitoso(request):
     if pedido_id:
         pedido = get_object_or_404(Pedido, id=pedido_id)
     else:
+        # En caso de emergencia o recarga de página, trae el último
         pedido = Pedido.objects.latest('id')
 
-    # Si viene desde Mercado Pago o se confirma transferencia, marcar pagado
-    pedido.estado_pago = 'AP'  # Aprobado
+    # Marcamos el estado del pago como Aprobado
+    pedido.estado_pago = 'AP'  
     
     # Si vino por la URL de transferencia, actualizamos el método en el modelo
     if metodo_url == 'transferencia':
-        pedido.metodo_pago = 'TR' # O la sigla que use tu modelo para Transferencias
+        pedido.metodo_pago = 'TR'  # Ajustalo según la sigla que use tu modelo (ej: 'TR' o 'Transferencia')
     
     pedido.save()
     
-    # Procesar detalles, armar texto y descontar stock
+    # Procesar detalles, armar el texto para WhatsApp y descontar stock
     detalles = DetallePedido.objects.filter(pedido=pedido)
     detalle_productos = ""
     
     for item in detalles:
         detalle_productos += f"- {item.cantidad}x {item.producto.nombre}\n"
         
-        # Descuento de stock si tu modelo Producto maneja el campo .stock
+        # Descuento automático de stock (se ejecuta si tu modelo Producto tiene el campo 'stock')
         if hasattr(item.producto, 'stock'):
             producto = item.producto
-            producto.stock = max(0, producto.stock - item.cantidad)
+            # Evita que el stock quede en números negativos
+            producto.stock = max(0, producto.stock - item.cantidad) 
             producto.save()
 
     # --- ENVÍO DE NOTIFICACIÓN WHATSAPP VIA CALLMEBOT ---
@@ -252,21 +254,24 @@ def pago_exitoso(request):
             f"💳 *Método:* {tipo_pago}"
         )
 
+        # Codificamos el mensaje para que sea una URL válida
         mensaje_url = quote(mensaje_texto)
-        url_bot = f"https://api.callmebot.com/whatsapp.php?phone={MI_NUMERO_WHATSAPP}&text={mensaje_url}&apikey={API_KEY_CALLMEBOT}"
+        url_bot = f"https://api.callmebot.com/whatsapp.php?phone={543585615079}&text={mensaje_url}&apikey={API_KEY_CALLMEBOT}"
         
+        # Hacemos la petición al bot con un tiempo de espera para que no trabe tu web
         requests.get(url_bot, timeout=10)
     except Exception as e:
-        print(f"Error enviando notificación: {e}")
+        print(f"Error enviando notificación de WhatsApp: {e}")
     
-    # Limpiamos el carrito de la sesión
+    # Limpiamos el carrito de la sesión del cliente
     carrito = Carrito(request)
     carrito.limpiar()
     
-    # Quitamos el ID de pedido de la sesión para dejarla lista para otra compra
+    # Borramos el ID del pedido residual de la sesión para dejarla lista para futuras compras
     if 'pedido_id' in request.session:
         del request.session['pedido_id']
         
+    # Renderizamos la pantalla final de agradecimiento
     return render(request, 'tienda/pago_confirmado.html', {
         'pedido': pedido, 
         'transferencia': (metodo_url == 'transferencia')

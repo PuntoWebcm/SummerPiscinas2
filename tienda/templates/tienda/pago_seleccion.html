@@ -66,12 +66,13 @@
             letter-spacing: 0.5px;
         }
 
-        /* Botón Mercado Pago Estilo Oficial */
+        /* Botón Mercado Pago Estilo Oficial Corregido */
         .btn-mercadopago {
             background-color: #fff159;
             color: #111;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-family: 'Open Sans', 'Roboto', sans-serif;
+            font-weight: 600;
+            font-size: 1.15rem;
             padding: 14px;
             width: 100%;
             border: none;
@@ -86,10 +87,6 @@
         .btn-mercadopago:hover {
             background-color: #e6d812;
             color: #111;
-        }
-        .btn-mercadopago img {
-            height: 22px;
-            margin-right: 8px;
         }
 
         .secure-text {
@@ -172,8 +169,8 @@
             </div>
             
             <div class="mb-2">
-                <a href="{{ init_point }}" class="btn-mercadopago shadow-sm">
-                    <img src="https://imgmp.mpheaders.com/4371_logo.png" alt="Mercado Pago">
+                <a href="{{ init_point }}" class="btn-mercadopago shadow-sm text-decoration-none">
+                    <i class="fas fa-credit-card me-2"></i> Pagar con Mercado Pago
                 </a>
             </div>
             <div class="mb-4">
