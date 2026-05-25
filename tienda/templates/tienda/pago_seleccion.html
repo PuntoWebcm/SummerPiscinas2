@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Método de Pago | Summer Piscinas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -15,7 +14,7 @@
             --bg-gris: #f8f9fa;
         }
         body { 
-            font-family: 'Roboto', sans-serif; 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-gris); 
             min-height: 100vh;
             display: flex;
@@ -23,7 +22,6 @@
         }
         .navbar { background-color: white !important; border-bottom: 3px solid var(--azul-vulcano); }
         
-        /* Contenedor idéntico al de tu captura de Sigma */
         .payment-container { 
             background: white; 
             max-width: 550px; 
@@ -56,7 +54,7 @@
         .price-total {
             font-size: 1.6rem;
             font-weight: 700;
-            color: #8b0000; /* Color rojo/bordó oscuro de la captura */
+            color: #8b0000; 
         }
 
         .section-label {
@@ -66,11 +64,9 @@
             letter-spacing: 0.5px;
         }
 
-        /* Botón Mercado Pago Estilo Oficial Corregido */
         .btn-mercadopago {
             background-color: #fff159;
             color: #111;
-            font-family: 'Open Sans', 'Roboto', sans-serif;
             font-weight: 600;
             font-size: 1.15rem;
             padding: 14px;
@@ -96,7 +92,6 @@
             text-decoration: none;
         }
 
-        /* Caja de Transferencia Bancaria Estilo Sigma */
         .transfer-box {
             border: 1px solid #e0e0e0;
             border-radius: 4px;
