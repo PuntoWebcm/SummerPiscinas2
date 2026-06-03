@@ -81,21 +81,13 @@ WSGI_APPLICATION = 'configuracion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# CONFIGURACIÓN FORZADA SIN PASAR POR LAS VARIABLES DE RENDER
+# BASE DE DATOS LOCAL INTERNA - SOLUCIÓN INMEDIATA
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'piletas_admin',
-        'USER': 'admin_piletas',
-        'PASSWORD': 'ErvD3cKJ6EvE5agS20KJxCJ5texBDn3A',
-        'HOST': 'dpg-d7lt87nlk1mc73b56t4g-a-oregon-postgres.render.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
