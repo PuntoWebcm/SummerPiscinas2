@@ -81,13 +81,19 @@ WSGI_APPLICATION = 'configuracion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# CONFIGURACIÓN FORZADA SIN PASAR POR LAS VARIABLES DE RENDER
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True  # <-- Esto fuerza el parámetro SSL dentro del parseo de la URL
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'piletas_admin',
+        'USER': 'admin_piletas',
+        'PASSWORD': 'ErvD3cKJ6EvE5agS20KJxCJ5texBDn3A',
+        'HOST': 'dpg-d7lt87nlk1mc73b56t4g-a-oregon-postgres.render.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
+    }
 }
 
 # Password validation
