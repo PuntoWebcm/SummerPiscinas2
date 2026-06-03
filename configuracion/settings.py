@@ -30,8 +30,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+ALLOWED_HOSTS = ['*'] 
 
 # Application definition
 
@@ -84,18 +84,12 @@ WSGI_APPLICATION = 'configuracion.wsgi.application'
 # BASE DE DATOS LOCAL INTERNA - SOLUCIÓN INMEDIATA
 # CONEXIÓN DIRECTA Y SEGURA A POSTGRESQL (PAGO)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'piletas_admin',
-        'USER': 'admin_piletas',
-        'PASSWORD': 'ErvD3cKJ6EvE5agS20KJxCJ5texBDn3A',
-        'HOST': 'dpg-d7lt87nlk1mc73b56t4g-a.oregon-postgres.onrender.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-        }
-    }
-}
+'default': dj_database_url.config(
+default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+conn_max_age=600
+)
+
+} 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
