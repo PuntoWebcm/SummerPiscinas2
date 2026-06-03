@@ -30,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -86,14 +86,9 @@ DATABASES = {
         default=os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
         conn_max_age=600,
         conn_health_checks=True,
+        ssl_require=True  # <-- Esto fuerza el parámetro SSL dentro del parseo de la URL
     )
 }
-
-# Si existe DATABASE_URL (estamos en Render), forzamos SSL al 100%
-if os.getenv('DATABASE_URL'):
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
-    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
