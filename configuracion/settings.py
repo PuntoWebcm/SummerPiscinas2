@@ -86,12 +86,11 @@ DATABASES = {
         default=os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
         conn_max_age=600,
         conn_health_checks=True,
-        # Esto le añade los argumentos de SSL directamente a la conexión de Postgres
-        ssl_require=True if os.getenv('DATABASE_URL') else False
     )
 }
 
-if not DEBUG:
+# Si existe DATABASE_URL (estamos en Render), forzamos SSL al 100%
+if os.getenv('DATABASE_URL'):
     DATABASES['default']['OPTIONS'] = {
         'sslmode': 'require',
     }
