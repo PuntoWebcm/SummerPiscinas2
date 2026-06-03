@@ -82,11 +82,19 @@ WSGI_APPLICATION = 'configuracion.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # BASE DE DATOS LOCAL INTERNA - SOLUCIÓN INMEDIATA
+# CONEXIÓN DIRECTA Y SEGURA A POSTGRESQL (PAGO)
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'piletas_admin',
+        'USER': 'admin_piletas',
+        'PASSWORD': 'ErvD3cKJ6EvE5agS20KJxCJ5texBDn3A',
+        'HOST': 'dpg-d7lt87nlk1mc73b56t4g-a.oregon-postgres.onrender.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        }
+    }
 }
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
